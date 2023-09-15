@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRScanner", "QRScanner\QRScanner.csproj", "{E7F2F023-C96F-4A5F-B082-42BA9FEC8CE4}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "QRShared", "QRShared\QRShared.shproj", "{AC407239-29CD-48C2-9A4F-571D3C975995}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

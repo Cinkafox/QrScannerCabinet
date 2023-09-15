@@ -7,16 +7,16 @@
 
     <ScrollView>
         <Grid>
-            <cv:CameraView x:Name="cameraView" HorizontalOptions="FillAndExpand"
+            <cv:CameraView x:Name="CameraView" HorizontalOptions="FillAndExpand"
                            VerticalOptions="FillAndExpand" EnableBarcode="True" 
-                           ResultReady="cameraView_ResultReady" FrameReady="cameraView_FrameReady"
+                           ResultReady="cameraView_ResultReady"
             />
-            <skia:SKCanvasView x:Name="canvasView" 
+            <skia:SKCanvasView x:Name="CanvasView" 
                                Margin="0"
                                HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"
                                PaintSurface="OnCanvasViewPaintSurface" />
             <Grid>
-                <Label x:Name="Result" Text="meow"/>
+                <Label x:Name="Result" Text="test think"/>
             </Grid>
         </Grid>
     </ScrollView>

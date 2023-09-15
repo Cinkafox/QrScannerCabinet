@@ -2,57 +2,18 @@
 using Camera.MAUI.ZXingHelper;
 using Capture.Vision.Maui;
 using Dynamsoft;
+using QRShared;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 
 namespace QRScanner;
-public class BarcodeQrData
-{
-    public string text;
-    public string format;
-    public SKPoint[] points;
-
-    public static BarcodeQrData[] Convert(BarcodeQRCodeReader.Result[] results)
-    {
-        BarcodeQrData[] output = null;
-        if (results != null && results.Length > 0)
-        {
-            output = new BarcodeQrData[results.Length];
-            for (int index = 0; index < results.Length; ++index)
-            {
-                BarcodeQRCodeReader.Result result = results[index];
-                BarcodeQrData data = new BarcodeQrData
-                {
-                    text = result.Text,
-                    format = result.Format1
-                };
-                int[] coordinates = result.Points;
-                if (coordinates != null && coordinates.Length == 8)
-                {
-                    data.points = new SKPoint[4];
-
-                    for (int i = 0; i < 4; ++i)
-                    {
-                        SKPoint p = new SKPoint();
-                        p.X = coordinates[i * 2];
-                        p.Y = coordinates[i * 2 + 1];
-                        data.points[i] = p;
-                    }
-                }
-
-
-                output[index] = data;
-            }
-        }
-        return output;
-    }
-}
 public partial class MainPage : ContentPage
 {
-    BarcodeQrData[] data = null;
-    private int imageWidth;
-    private int imageHeight;
-    bool saveImage = true;
+    BarcodeQrData[] _data = null;
+    private int _imageWidth;
+    private int _imageHeight;
+
+    private ResultBottomSheet? _currentBottonSheet = null;
 
     public MainPage()
     {
@@ -66,46 +27,10 @@ public partial class MainPage : ContentPage
         await Task.Run(() =>
         {
             BarcodeQRCodeReader.InitLicense("DLS2eyJoYW5kc2hha2VDb2RlIjoiMjAwMDAxLTE2NDk4Mjk3OTI2MzUiLCJvcmdhbml6YXRpb25JRCI6IjIwMDAwMSIsInNlc3Npb25QYXNzd29yZCI6IndTcGR6Vm05WDJrcEQ5YUoifQ==");
-
             return Task.CompletedTask;
         });
     }
     
-    private void OnDisappearing(object sender, EventArgs e)
-    {
-        cameraView.ShowCameraView = false;
-    }
-
-    private void cameraView_FrameReady(object sender, FrameReadyEventArgs e)
-    {
-        // process image
-        if (saveImage)
-        {
-            saveImage = false;
-            byte[] buffer = (byte[])e.Buffer;
-            int width = e.Width;
-            int height = e.Height;
-            int stride = e.Stride;
-            FrameReadyEventArgs.PixelFormat format = e.Format;
-
-            SKImageInfo info = new SKImageInfo(width, height, SKColorType.Gray8, SKAlphaType.Premul);
-
-            // Create the SKBitmap
-            SKBitmap bitmap = new SKBitmap(info);
-            bitmap.SetPixels((Marshal.UnsafeAddrOfPinnedArrayElement(buffer, 0)));
-
-            // Save the data to a file
-            using SKImage image = SKImage.FromBitmap(bitmap);
-            using SKData data = image.Encode(SKEncodedImageFormat.Jpeg, 100);
-            var appDataDirectory = FileSystem.AppDataDirectory;
-
-            // Combine the app's data directory path with your file name
-            var filePath = Path.Combine(appDataDirectory, "yourfile.jpg");
-
-            using FileStream stream = File.OpenWrite(filePath);
-            data.SaveTo(stream);
-        }
-    }
 
     private void cameraView_ResultReady(object sender, ResultReadyEventArgs e)
     {
@@ -116,16 +41,19 @@ public partial class MainPage : ContentPage
             {
                 Result.Text = result.Text;
             }
-            data = BarcodeQrData.Convert((BarcodeQRCodeReader.Result[])e.Result);
-
-
+            ShowBottomSheet(new RoomInformation()
+            {
+                Text = results[0].Text
+            });
+            
+            _data = BarcodeQrData.Convert((BarcodeQRCodeReader.Result[])e.Result);
         }
-        imageWidth = e.PreviewWidth;
-        imageHeight = e.PreviewHeight;
+        _imageWidth = e.PreviewWidth;
+        _imageHeight = e.PreviewHeight;
 
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            canvasView.InvalidateSurface();
+            CanvasView.InvalidateSurface();
         });
     }
 
@@ -137,10 +65,27 @@ public partial class MainPage : ContentPage
         return rotatedPoint;
     }
 
+    public void ShowBottomSheet(RoomInformation information)
+    {
+        MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                if (_currentBottonSheet == null)
+                {
+                    _currentBottonSheet = new ResultBottomSheet(information)
+                    {
+                        HasHandle = true
+                    };
+                    _currentBottonSheet.Dismissed += (sender, args) => _currentBottonSheet = null;
+                    
+                    await _currentBottonSheet.ShowAsync(Window);
+                }
+            });
+    }
+
     void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
     {
-        double width = canvasView.Width;
-        double height = canvasView.Height;
+        double width = CanvasView.Width;
+        double height = CanvasView.Height;
 
         var mainDisplayInfo = DeviceDisplay.MainDisplayInfo;
         var orientation = mainDisplayInfo.Orientation;
@@ -154,19 +99,19 @@ public partial class MainPage : ContentPage
 
         if (orientation == DisplayOrientation.Portrait)
         {
-            widthScale = imageHeight / width;
-            heightScale = imageWidth / height;
+            widthScale = _imageHeight / width;
+            heightScale = _imageWidth / height;
             scale = widthScale < heightScale ? widthScale : heightScale;
-            scaledWidth = imageHeight / scale;
-            scaledHeight = imageWidth / scale;
+            scaledWidth = _imageHeight / scale;
+            scaledHeight = _imageWidth / scale;
         }
         else
         {
-            widthScale = imageWidth / width;
-            heightScale = imageHeight / height;
+            widthScale = _imageWidth / width;
+            heightScale = _imageHeight / height;
             scale = widthScale < heightScale ? widthScale : heightScale;
-            scaledWidth = imageWidth / scale;
-            scaledHeight = imageHeight / scale;
+            scaledWidth = _imageWidth / scale;
+            scaledHeight = _imageHeight / scale;
         }
 
         SKImageInfo info = args.Info;
@@ -190,9 +135,9 @@ public partial class MainPage : ContentPage
             StrokeWidth = 4,
         };
 
-        if (data != null)
+        if (_data != null)
         {
-            foreach (BarcodeQrData barcodeQrData in data)
+            foreach (BarcodeQrData barcodeQrData in _data)
             {
                 //ResultLabel.Text += barcodeQrData.text + "\n";
 
@@ -200,7 +145,7 @@ public partial class MainPage : ContentPage
                 {
                     if (orientation == DisplayOrientation.Portrait)
                     {
-                        barcodeQrData.points[i] = rotateCW90(barcodeQrData.points[i], imageHeight);
+                        barcodeQrData.points[i] = rotateCW90(barcodeQrData.points[i], _imageHeight);
                     }
 
                     if (widthScale < heightScale)
