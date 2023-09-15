@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using Camera.MAUI.ZXingHelper;
-using Capture.Vision.Maui;
+﻿using Capture.Vision.Maui;
 using Dynamsoft;
 using QRShared;
 using SkiaSharp;
@@ -9,11 +7,11 @@ using SkiaSharp.Views.Maui;
 namespace QRScanner;
 public partial class MainPage : ContentPage
 {
-    BarcodeQrData[] _data = null;
+    private BarcodeQrData[]? _data;
     private int _imageWidth;
     private int _imageHeight;
 
-    private ResultBottomSheet? _currentBottonSheet = null;
+    private ResultBottomSheet? _currentBottomSheet = null;
 
     public MainPage()
     {
@@ -37,13 +35,9 @@ public partial class MainPage : ContentPage
         if (e.Result != null)
         {
             BarcodeQRCodeReader.Result[] results = (BarcodeQRCodeReader.Result[])e.Result;
-            foreach (BarcodeQRCodeReader.Result result in results)
-            {
-                Result.Text = result.Text;
-            }
             ShowBottomSheet(new RoomInformation()
             {
-                Text = results[0].Text
+                Text = results[0].Text!
             });
             
             _data = BarcodeQrData.Convert((BarcodeQRCodeReader.Result[])e.Result);
@@ -57,7 +51,7 @@ public partial class MainPage : ContentPage
         });
     }
 
-    public static SKPoint rotateCW90(SKPoint point, int width)
+    private static SKPoint RotateCw90(SKPoint point, int width)
     {
         SKPoint rotatedPoint = new SKPoint();
         rotatedPoint.X = width - point.Y;
@@ -65,19 +59,19 @@ public partial class MainPage : ContentPage
         return rotatedPoint;
     }
 
-    public void ShowBottomSheet(RoomInformation information)
+    private void ShowBottomSheet(RoomInformation information)
     {
         MainThread.BeginInvokeOnMainThread(async () =>
             {
-                if (_currentBottonSheet == null)
+                if (_currentBottomSheet == null)
                 {
-                    _currentBottonSheet = new ResultBottomSheet(information)
+                    _currentBottomSheet = new ResultBottomSheet(information)
                     {
                         HasHandle = true
                     };
-                    _currentBottonSheet.Dismissed += (sender, args) => _currentBottonSheet = null;
+                    _currentBottomSheet.Dismissed += (sender, args) => _currentBottomSheet = null;
                     
-                    await _currentBottonSheet.ShowAsync(Window);
+                    await _currentBottomSheet.ShowAsync(Window);
                 }
             });
     }
@@ -89,7 +83,6 @@ public partial class MainPage : ContentPage
 
         var mainDisplayInfo = DeviceDisplay.MainDisplayInfo;
         var orientation = mainDisplayInfo.Orientation;
-        var rotation = mainDisplayInfo.Rotation;
         var density = mainDisplayInfo.Density;
 
         width *= density;
@@ -113,8 +106,7 @@ public partial class MainPage : ContentPage
             scaledWidth = _imageWidth / scale;
             scaledHeight = _imageHeight / scale;
         }
-
-        SKImageInfo info = args.Info;
+        
         SKSurface surface = args.Surface;
         SKCanvas canvas = surface.Canvas;
 
@@ -139,13 +131,12 @@ public partial class MainPage : ContentPage
         {
             foreach (BarcodeQrData barcodeQrData in _data)
             {
-                //ResultLabel.Text += barcodeQrData.text + "\n";
 
                 for (int i = 0; i < 4; i++)
                 {
                     if (orientation == DisplayOrientation.Portrait)
                     {
-                        barcodeQrData.points[i] = rotateCW90(barcodeQrData.points[i], _imageHeight);
+                        barcodeQrData.points[i] = RotateCw90(barcodeQrData.points[i], _imageHeight);
                     }
 
                     if (widthScale < heightScale)
