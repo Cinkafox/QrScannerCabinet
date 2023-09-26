@@ -1,8 +1,7 @@
+namespace QRScanner;
+
 using Dynamsoft;
 using SkiaSharp;
-
-namespace QRShared;
-
 public class BarcodeQrData
 {
     public string text;

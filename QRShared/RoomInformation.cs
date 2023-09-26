@@ -1,7 +1,9 @@
 namespace QRShared;
 
-public sealed class RoomInformation
+public class RoomInformation
 {
-   public string Text = "Template";
+   public int Id { get; set; }
+   public string Name { get; init; } = string.Empty;
+
 }
 

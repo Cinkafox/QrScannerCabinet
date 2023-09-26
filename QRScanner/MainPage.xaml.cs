@@ -35,9 +35,9 @@ public partial class MainPage : ContentPage
         if (e.Result != null)
         {
             BarcodeQRCodeReader.Result[] results = (BarcodeQRCodeReader.Result[])e.Result;
-            ShowBottomSheet(new RoomInformation()
+            ShowBottomSheet(new RoomInformation
             {
-                Text = results[0].Text!
+                Name = results[0].Text!
             });
             
             _data = BarcodeQrData.Convert((BarcodeQRCodeReader.Result[])e.Result);

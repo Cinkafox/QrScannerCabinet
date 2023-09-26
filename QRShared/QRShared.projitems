@@ -9,7 +9,6 @@
     <Import_RootNamespace>QRShared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)BarcodeQrData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RoomInformation.cs" />
   </ItemGroup>
 </Project>
