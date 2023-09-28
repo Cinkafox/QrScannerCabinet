@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using QRDataBase;
+using QRDataBase.Providers;
 using QRShared;
 
 namespace QRServer.Controllers;
@@ -7,14 +9,24 @@ namespace QRServer.Controllers;
 [Route("[controller]")]
 public class RoomInformationController : ControllerBase
 {
-    
-    [HttpGet(Name = "GetRoomInformation")]
-    public RoomInformation Get()
+    private IDataBaseProvider _provider;
+
+    public RoomInformationController(IDataBaseManager dbManager)
     {
-        return new RoomInformation
-        {
-            Name = "Meow",
-            Id = 12
-        };
+        _provider = dbManager.GetProvider();
+    }
+    
+    [HttpGet("{id:int}",Name = "GetRoomInformation")]
+    public RoomInformation Get(int id)
+    {
+       var room = _provider.GetRoomById(id);
+       if (room == null)
+           return NullInformation.Information;
+       
+       return new RoomInformation()
+       {
+           Id = room.Id,
+           Name = room.Name
+       };
     }
 }

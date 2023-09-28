@@ -6,6 +6,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "QRShared", "QRShared\QRShar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRServer", "QRServer\QRServer.csproj", "{4AF14919-6FF1-457D-8078-A7FFC425B524}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRDataBase", "QRDataBase\QRDataBase.csproj", "{A7929985-FB77-460F-AAE6-D0C4655FC806}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,5 +22,9 @@ Global
 		{4AF14919-6FF1-457D-8078-A7FFC425B524}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AF14919-6FF1-457D-8078-A7FFC425B524}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AF14919-6FF1-457D-8078-A7FFC425B524}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7929985-FB77-460F-AAE6-D0C4655FC806}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7929985-FB77-460F-AAE6-D0C4655FC806}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7929985-FB77-460F-AAE6-D0C4655FC806}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7929985-FB77-460F-AAE6-D0C4655FC806}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
