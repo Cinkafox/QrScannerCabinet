@@ -1,7 +1,5 @@
 ﻿using Camera.MAUI;
-using Capture.Vision.Maui;
 using Microsoft.Extensions.Logging;
-using SkiaSharp.Views.Maui.Controls.Hosting;
 using The49.Maui.BottomSheet;
 
 namespace QRScanner;
@@ -13,8 +11,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseSkiaSharp()
-            .UseNativeCameraView()
+            .UseMauiCameraView()
             .UseBottomSheet()
             .ConfigureFonts(fonts =>
             {

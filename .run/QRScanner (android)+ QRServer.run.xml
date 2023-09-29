@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="QRScanner (android)+ QRServer" type="CompoundRunConfigurationType">
+    <toRun name="QRServer: http" type="LaunchSettings" />
+    <toRun name="QRScanner" type="XamarinAndroidProject" />
+    <method v="2" />
+  </configuration>
+</component>
