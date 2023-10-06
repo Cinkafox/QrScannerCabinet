@@ -1,11 +1,13 @@
-﻿namespace QRScanner;
+﻿using QRScanner.Services;
+
+namespace QRScanner;
 
 public partial class App : Application
 {
-    public App()
+    public App(RestService service)
     {
         InitializeComponent();
 
-        MainPage = new MainPage();
+        MainPage = new MainPage(service);
     }
 }

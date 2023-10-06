@@ -10,25 +10,12 @@ namespace QRServer.Controllers;
 public class CreateRoomInformationController : ControllerBase
 {
     private IDataBaseProvider _provider;
-
     public CreateRoomInformationController(IDataBaseManager dbManager)
     {
         _provider = dbManager.GetProvider();
     }
-
     
-    [HttpGet("{id:int}/{name}", Name = "AddRoomInformation")]
-    public bool Get(int id,string name)
-    {
-        _provider.CreateRoom(new ()
-        {
-            Id = id,
-            Name = name
-        });
-        return true;
-    }
-
-    [HttpPost(Name = "AddSomeShit")]
+    [HttpPost(Name = "AddRoomInformation")]
     public bool Post(RoomInformation roomInformation)
     {
         _provider.CreateRoom(new ()

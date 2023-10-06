@@ -15,6 +15,6 @@ public partial class ResultBottomSheet : BottomSheet
 
     private void PasteInformation()
     {
-        SomeText.Text = Information.Name;
+        SomeText.Text = Information.Name + " " + Information.Id;
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Camera.MAUI;
 using Microsoft.Extensions.Logging;
+using QRScanner.Services;
 using The49.Maui.BottomSheet;
+using ZXing.Net.Maui.Controls;
 
 namespace QRScanner;
 
@@ -11,14 +13,14 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseMauiCameraView()
+            .UseBarcodeReader()
             .UseBottomSheet()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
-
+        builder.Services.AddSingleton<RestService>();
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
