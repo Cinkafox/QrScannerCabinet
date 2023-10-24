@@ -7,29 +7,23 @@ namespace QRScanner.Services;
 
 public class RestService
 {
-    HttpClient _client;
-    JsonSerializerOptions _serializerOptions;
-
-    public RestService()
+    HttpClient _client = new();
+    JsonSerializerOptions _serializerOptions = new()
     {
-        _client = new HttpClient();
-        _serializerOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true
-        };
-    }
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true
+    };
     
-    public async Task<RoomInformation> GetRoomInformationAsync(Uri uri)
+    public async Task<List<T>> GetInformationAsync<T>(Uri uri) where T: BaseInformation
     {
-        RoomInformation item = NullInformation.Information;
+        var items = new List<T>();
         try
         {
             HttpResponseMessage response = await _client.GetAsync(uri);
             if (response.IsSuccessStatusCode)
             {
                 string content = await response.Content.ReadAsStringAsync();
-                item = JsonSerializer.Deserialize<RoomInformation>(content, _serializerOptions) ?? item;
+                items = JsonSerializer.Deserialize<List<T>>(content, _serializerOptions) ?? items;
             }
         }
         catch (Exception ex)
@@ -37,14 +31,14 @@ public class RestService
             Debug.WriteLine(@"\tERROR {0}", ex.Message);
         }
 
-        return item;
+        return items;
     }
     
-    public async Task AddRoomInformation(RoomInformation roomInformation,ConnectionSetting setting)
+    public async Task AddInformation<T>(BaseInformation information,ConnectionSetting setting) where T: BaseInformation
     {
         try
         {
-            var json = JsonSerializer.Serialize<RoomInformation>(roomInformation, _serializerOptions);
+            var json = JsonSerializer.Serialize<T>((T)information, _serializerOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             
             var response = await _client.PostAsync(setting.Url, content);

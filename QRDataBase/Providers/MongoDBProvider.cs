@@ -20,14 +20,13 @@ public class MongoDBProvider : IDataBaseProvider
         _database = _client.GetDatabase(option.DataBase);
     }
 
-    public void CreateRoom(RoomInformation information)
+    public void CreateInformation<T>(BaseInformation information) where T : BaseInformation
     {
-        _database.GetCollection<RoomInformation>("rooms").InsertOneAsync(information);
+        _database.GetCollection<T>(typeof(T).Name).InsertOneAsync((T)information);
     }
 
-    public RoomInformation? GetRoomById(long id)
+    public List<T> GetInformationById<T>(long id, string idName = "_id") where T : BaseInformation
     {
-        var rooms = _database.GetCollection<RoomInformation>("rooms").FindSync(new BsonDocument("_id",id)).ToList();
-        return rooms.Count == 0 ? null : rooms.First();
+        return _database.GetCollection<T>(typeof(T).Name).FindSync(new BsonDocument(idName,id)).ToList();
     }
 }

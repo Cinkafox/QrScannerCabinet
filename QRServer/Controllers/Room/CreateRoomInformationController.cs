@@ -3,26 +3,22 @@ using QRDataBase;
 using QRDataBase.Providers;
 using QRShared;
 
-namespace QRServer.Controllers;
+namespace QRServer.Controllers.Room;
 
 [ApiController]
 [Route("[controller]")]
 public class CreateRoomInformationController : ControllerBase
 {
-    private IDataBaseProvider _provider;
+    private readonly IDataBaseProvider _provider;
     public CreateRoomInformationController(IDataBaseManager dbManager)
     {
         _provider = dbManager.GetProvider();
     }
     
     [HttpPost(Name = "AddRoomInformation")]
-    public bool Post(RoomInformation roomInformation)
+    public bool Post(RoomInformation room)
     {
-        _provider.CreateRoom(new ()
-        {
-            Id = roomInformation.Id,
-            Name = roomInformation.Name
-        });
+        _provider.CreateInformation<RoomInformation>(room);
         return true;
     }
 }

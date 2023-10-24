@@ -6,7 +6,7 @@ using ContentPage = Microsoft.Maui.Controls.ContentPage;
 namespace QRScanner;
 public partial class MainPage : ContentPage
 {
-    private ResultBottomSheet? _currentBottomSheet = null;
+    private ResultBottomSheet? _currentBottomSheet;
     private RestService _rest;
 
     public MainPage(RestService service)
@@ -21,17 +21,17 @@ public partial class MainPage : ContentPage
         };
         _rest = service;
     }
-    private void ShowBottomSheet(RoomInformation information)
+    private void ShowBottomSheet(RoomInformation information,List<RoomImageInformation> imageInformations)
     {
         MainThread.BeginInvokeOnMainThread(async () =>
             {
                 if (_currentBottomSheet == null)
                 {
-                    _currentBottomSheet = new ResultBottomSheet(information)
+                    _currentBottomSheet = new ResultBottomSheet(information,imageInformations)
                     {
                         HasHandle = true
                     };
-                    _currentBottomSheet.Dismissed += (sender, args) => _currentBottomSheet = null;
+                    _currentBottomSheet.Dismissed += (_, _) => _currentBottomSheet = null;
                     
                     await _currentBottomSheet.ShowAsync(Window);
                 }
@@ -45,11 +45,24 @@ public partial class MainPage : ContentPage
         {
             Result.Text = e.Results[0].Value;
         });
-
-        var url = new Uri(e.Results[0].Value);
-        var information = await _rest.GetRoomInformationAsync(url);
         
-        ShowBottomSheet(information);
-
+        if(_currentBottomSheet != null) return;
+        
+        var infoUrl = new Uri(e.Results[0].Value);
+        var imageUrl = new UriBuilder(infoUrl.Scheme, infoUrl.Host, infoUrl.Port,
+            $"RoomImageInformation/{infoUrl.Segments[^1]}").Uri;
+        
+        var information = await _rest.GetInformationAsync<RoomInformation>(infoUrl);
+        var imageInformation = await _rest.GetInformationAsync<RoomImageInformation>(imageUrl);
+        
+        if (information.Count == 0)
+            information.Add(new RoomInformation()
+            {
+                Id = -1,
+                Name = "Ошибка",
+                Description = "Кабинет не найден!"
+            });
+        
+        ShowBottomSheet(information[0],imageInformation);
     }
 }

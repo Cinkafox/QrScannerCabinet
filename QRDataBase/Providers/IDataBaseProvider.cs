@@ -5,6 +5,6 @@ namespace QRDataBase.Providers;
 public interface IDataBaseProvider
 {
    public void Connect(DataBaseOption option);
-   public void CreateRoom(RoomInformation information);
-   public RoomInformation? GetRoomById(long id);
+   public void CreateInformation<T>(BaseInformation information) where T : BaseInformation;
+   public List<T> GetInformationById<T>(long id, string idName = "_id") where T : BaseInformation;
 }

@@ -16,6 +16,4 @@
       <ProjectReference Include="..\QRDataBase\QRDataBase.csproj" />
     </ItemGroup>
 
-    <Import Project="..\QRShared\QRShared.projitems" Label="Shared" />
-
 </Project>
