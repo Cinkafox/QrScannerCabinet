@@ -16,26 +16,24 @@ public partial class MainPage : ContentPage
         {
             Formats = BarcodeFormats.TwoDimensional,
             AutoRotate = true,
-            Multiple = true,
-            //TryHarder = true
+            Multiple = true
         };
         _rest = service;
     }
     private void ShowBottomSheet(RoomInformation information,List<RoomImageInformation> imageInformations)
     {
-        MainThread.BeginInvokeOnMainThread(async () =>
+        async void Action()
+        {
+            if (_currentBottomSheet == null)
             {
-                if (_currentBottomSheet == null)
-                {
-                    _currentBottomSheet = new ResultBottomSheet(information,imageInformations)
-                    {
-                        HasHandle = true
-                    };
-                    _currentBottomSheet.Dismissed += (_, _) => _currentBottomSheet = null;
-                    
-                    await _currentBottomSheet.ShowAsync(Window);
-                }
-            });
+                _currentBottomSheet = new ResultBottomSheet(information, imageInformations) { HasHandle = true };
+                _currentBottomSheet.Dismissed += (_, _) => _currentBottomSheet = null;
+
+                await _currentBottomSheet.ShowAsync(Window);
+            }
+        }
+
+        MainThread.BeginInvokeOnMainThread(Action);
     }
     
 

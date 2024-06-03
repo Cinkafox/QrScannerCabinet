@@ -1,9 +1,12 @@
-using QRDataBase.Providers;
-
 namespace QRDataBase;
 
 public static class Config
 {
-    public static readonly DataBaseOption ConnectionOption = new("localhost", 27017, "QRDB", "qrlet", "12341");
-    public static readonly IDataBaseProvider Provider = new MongoDBProvider();
+    public static DataBaseOption ConnectionOption => new(
+        Environment.GetEnvironmentVariable("ip") ?? "localhost",
+        int.Parse(Environment.GetEnvironmentVariable("port") ?? "3306"),
+        Environment.GetEnvironmentVariable("dataBase") ?? "root",
+        Environment.GetEnvironmentVariable("login") ?? "root",
+        Environment.GetEnvironmentVariable("password") ?? "root");
+    
 }
