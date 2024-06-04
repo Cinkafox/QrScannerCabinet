@@ -1,5 +1,4 @@
-﻿using Camera.MAUI;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using QRScanner.Services;
 using The49.Maui.BottomSheet;
 using ZXing.Net.Maui.Controls;
@@ -21,6 +20,8 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
         builder.Services.AddSingleton<RestService>();
+        builder.Services.AddSingleton<AuthService>();
+        builder.Services.AddSingleton<DebugService>();
 #if DEBUG
         builder.Logging.AddDebug();
 #endif

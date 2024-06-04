@@ -11,7 +11,41 @@
               BarcodesDetected="BarcodesDetected" IsTorchOn="True"/>
             
             <Grid>
-                <Label x:Name="Result" Text="test think"/>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.15*" />
+                    <RowDefinition Height="1.85*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                
+                <Button 
+                    Clicked="MenuButtonClicked" 
+                    Text="|||" 
+                    BackgroundColor="Transparent" 
+                    HorizontalOptions="Start" 
+                    FontSize="25" 
+                    TextColor="WhiteSmoke"/>
+                <Button 
+                    Clicked="DebugButtonClicked" 
+                    Text="DEBUG" 
+                    Height="2"
+                    Grid.Row="0" 
+                    Grid.Column="2"
+                    x:Name="DevButton" 
+                    IsVisible="False"/>
+                
+                <Image Grid.Row="1" 
+                       Grid.Column="1" 
+                       x:Name="ProcessingImage" 
+                       Source="loading.gif" 
+                       IsVisible="False" 
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       IsAnimationPlaying="False"/>
             </Grid>
         </Grid>
     </ScrollView>

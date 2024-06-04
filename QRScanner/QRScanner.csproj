@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0-android</TargetFramework>
-        <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
-        <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-        <!-- <TargetFrameworks>$(TargetFrameworks);net7.0-tizen</TargetFrameworks> -->
+        <TargetFramework>net8.0-android</TargetFramework>
         <OutputType>Exe</OutputType>
         <RootNamespace>QRScanner</RootNamespace>
         <UseMaui>true</UseMaui>
@@ -23,15 +20,12 @@
         <ApplicationVersion>1</ApplicationVersion>
 
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
-        <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
         <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+        <MauiIcon Include="Resources\AppIcon\icon.png"/>
 
         <!-- Splash Screen -->
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -56,6 +50,26 @@
         <PackageReference Include="The49.Maui.BottomSheet" Version="1.0.2" />
         <PackageReference Include="ZXing.Net.Maui" Version="0.3.0-preview.1" />
         <PackageReference Include="ZXing.Net.Maui.Controls" Version="0.3.0-preview.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiXaml Update="BottomSheets\ResultBottomSheet.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="BottomSheets\ResultBottomSheet.xaml.cs">
+        <DependentUpon>ResultBottomSheet.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <MauiPlatformSpecificFolder Remove="Platforms\iOS\" />
+      <MauiPlatformSpecificFolder Remove="Platforms\MacCatalyst\" />
+      <MauiPlatformSpecificFolder Remove="Platforms\Tizen\" />
+      <MauiPlatformSpecificFolder Remove="Platforms\Windows\" />
     </ItemGroup>
 
     <Import Project="..\QRShared\QRShared.projitems" Label="Shared" />

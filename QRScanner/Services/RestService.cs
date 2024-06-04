@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using QRShared;
@@ -7,47 +8,69 @@ namespace QRScanner.Services;
 
 public class RestService
 {
+    private readonly DebugService _debug;
     HttpClient _client = new();
     JsonSerializerOptions _serializerOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = true
     };
-    
-    public async Task<List<T>> GetInformationAsync<T>(Uri uri) where T: BaseInformation
-    {
-        var items = new List<T>();
-        try
-        {
-            HttpResponseMessage response = await _client.GetAsync(uri);
-            if (response.IsSuccessStatusCode)
-            {
-                string content = await response.Content.ReadAsStringAsync();
-                items = JsonSerializer.Deserialize<List<T>>(content, _serializerOptions) ?? items;
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine(@"\tERROR {0}", ex.Message);
-        }
 
-        return items;
+    public RestService(DebugService debug)
+    {
+        _debug = debug;
     }
     
-    public async Task AddInformation<T>(BaseInformation information,ConnectionSetting setting) where T: BaseInformation
+    public async Task<T?> GetAsync<T>(Uri uri)
     {
         try
         {
-            var json = JsonSerializer.Serialize<T>((T)information, _serializerOptions);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            
-            var response = await _client.PostAsync(setting.Url, content);
+            var response = await _client.GetAsync(uri);
             if (response.IsSuccessStatusCode)
-                Debug.WriteLine(@"\tTodoItem successfully saved.");
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                _debug.Debug($"SUCCESSFUL GET CONTENT {nameof(T)} URL {uri}");
+                return JsonSerializer.Deserialize<T>(content, _serializerOptions);
+            }
+
+            _debug.Error("ERROR " + response.StatusCode );
         }
         catch (Exception ex)
         {
-            Debug.WriteLine(@"\tERROR {0}", ex.Message);
+           _debug.Error("ERROR WHILE CONNECTION " + ex.Message);
         }
+
+        return default;
+    }
+
+    public async Task<T> GetAsyncDefault<T>(Uri uri, T defaultValue)
+    {
+        return await GetAsync<T>(uri) ?? defaultValue;
+    }
+    
+    public async Task<bool> AddAsync<T>(T information,Uri url, Guid? token = null) where T: BaseInformation
+    {
+        if (token is not null)
+        {
+            var builder = new UriBuilder(url);
+            builder.Query = "?token=" + token;
+            url = builder.Uri;
+        }
+        
+        try
+        {
+            var json = JsonSerializer.Serialize(information, _serializerOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            
+            var response = await _client.PostAsync(url, content);
+            if (response.IsSuccessStatusCode)
+                return true;
+        }
+        catch (Exception ex)
+        {
+            _debug.Debug("ERROR " + ex.Message);
+        }
+
+        return false;
     }
 }

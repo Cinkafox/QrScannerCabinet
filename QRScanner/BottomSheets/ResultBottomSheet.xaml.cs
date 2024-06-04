@@ -1,16 +1,16 @@
 using QRShared;
 using The49.Maui.BottomSheet;
 
-namespace QRScanner;
+namespace QRScanner.BottomSheets;
 
 public partial class ResultBottomSheet : BottomSheet
 {
     public RoomInformation Information;
     public List<RoomImageInformation> ImageInformations;
-    public ResultBottomSheet(RoomInformation information,List<RoomImageInformation> imageInformation)
+    public ResultBottomSheet(ResultCabinet resultCabinet)
     {
-        Information = information;
-        ImageInformations = imageInformation;
+        Information = resultCabinet.Information;
+        ImageInformations = resultCabinet.ImageInformation;
         
         InitializeComponent();
         PasteInformation();
@@ -59,3 +59,5 @@ public partial class ResultBottomSheet : BottomSheet
         return stackLayout;
     }
 }
+
+public record struct ResultCabinet(RoomInformation Information,List<RoomImageInformation> ImageInformation);

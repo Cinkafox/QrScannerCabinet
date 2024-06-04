@@ -17,11 +17,3 @@ public class RoomImageInformation : BaseInformation
    public string URL { get; init; } = string.Empty;
    public string Description { get; init; } = string.Empty;
 }
-
-public static class NullInformation
-{
-   public static BaseInformation Information = new BaseInformation()
-   {
-      Id = -1
-   };
-}
