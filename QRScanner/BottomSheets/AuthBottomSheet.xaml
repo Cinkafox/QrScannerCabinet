@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<the49:BottomSheet xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                   xmlns:the49="https://schemas.the49.com/dotnet/2023/maui"
+                   x:Class="QRScanner.BottomSheets.AuthBottomSheet">
+    <the49:BottomSheet.Detents>
+        <the49:FullscreenDetent />
+    </the49:BottomSheet.Detents>
+    
+    <ScrollView Orientation="Vertical">
+        <VerticalStackLayout Margin="10">
+            <VerticalStackLayout x:Name="UrlLayout">
+                <HorizontalStackLayout>
+                    <Label Text="Server Url:" VerticalTextAlignment="Center"/>
+                    <Entry x:Name="UriEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill"/>
+                </HorizontalStackLayout>
+                <Label x:Name="Message" VerticalTextAlignment="Center"/>
+                <Button Text="Apply" Clicked="ApplyClicked" x:Name="ApplyButton"/>
+            </VerticalStackLayout>
+            
+            <VerticalStackLayout x:Name="LoginLayout" IsEnabled="False" Margin="0,15,0,0">
+                <HorizontalStackLayout>
+                    <Label Text="Login:" VerticalTextAlignment="Center"/>
+                    <Entry x:Name="LoginEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill"/>
+                </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <Label Text="Password:" VerticalTextAlignment="Center"/>
+                    <Entry x:Name="PasswordEntry" IsPassword="True" VerticalTextAlignment="Center" HorizontalOptions="Fill"/>
+                </HorizontalStackLayout>
+                <Label x:Name="MessageAuth" VerticalTextAlignment="Center"/>
+                <Button Text="Auth" Clicked="AuthClicked" x:Name="AuthButton"/>
+            </VerticalStackLayout>
+            
+        </VerticalStackLayout>
+    </ScrollView>
+    
+</the49:BottomSheet>

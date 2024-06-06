@@ -1,5 +1,6 @@
 ﻿using QRScanner.BottomSheets;
 using QRScanner.Services;
+using QRScanner.Utils;
 using QRShared;
 using The49.Maui.BottomSheet;
 using ZXing.Net.Maui;
@@ -8,10 +9,10 @@ using ContentPage = Microsoft.Maui.Controls.ContentPage;
 namespace QRScanner;
 public partial class MainPage : ContentPage
 {
-    private readonly BottomSheetCollection _bottomSheetCollection;
-    private readonly RestService _rest;
-    public  readonly DebugService _debug;
-    private readonly AuthService _auth;
+    public readonly BottomSheetCollection BottomSheetCollection;
+    public readonly RestService Rest;
+    public readonly DebugService Debug;
+    public readonly AuthService Auth;
     
     private bool _isProcessing ;
     private bool _devEnabled;
@@ -37,37 +38,37 @@ public partial class MainPage : ContentPage
             Multiple = true
         };
 
-        _bottomSheetCollection = new BottomSheetCollection(this);
-        _rest = service;
-        _debug = debug;
-        _auth = auth;
+        BottomSheetCollection = new BottomSheetCollection(this);
+        Rest = service;
+        Debug = debug;
+        Auth = auth;
         
         if (Dumper.TryReadDump(out var dumpReader))
         {
-            _debug.Debug("____START READ DUMP____");
+            Debug.Debug("____START READ DUMP____");
             while (dumpReader.ReadLine() is { } line)
             {
-                _debug.Debug(line);
+                Debug.Debug(line);
             }
             
             dumpReader.Dispose();
-            _debug.Debug("____END READ DUMP____");
+            Debug.Debug("____END READ DUMP____");
         }
         
-        _debug.Debug("Application was started!");
+        Debug.Debug("Application was started!");
     }
 
     private async void BarcodesDetected(object? sender, BarcodeDetectionEventArgs e)
     {
         var scanned = e.Results[0].Value;
-        _debug.Debug("SCANNED: " + scanned);
+        Debug.Debug("SCANNED: " + scanned);
         
-        if(_isProcessing || _bottomSheetCollection.IsSheetsShow ||
+        if(_isProcessing || BottomSheetCollection.IsSheetsShow ||
            !Uri.TryCreate(scanned, UriKind.Absolute,out var uri) || 
            !Uri.TryCreate(scanned + "/Images",UriKind.Absolute, out var imageUri))
             return;
         
-        _debug.Debug("RESOLVING: " + scanned);
+        Debug.Debug("RESOLVING: " + scanned);
         
         _isProcessing = true;
         MainThread.BeginInvokeOnMainThread(() =>
@@ -76,20 +77,20 @@ public partial class MainPage : ContentPage
             ProcessingImage.IsAnimationPlaying = true;
         });
 
-        var information = await _rest.GetAsyncDefault(uri,new RoomInformation()
+        var information = await Rest.GetAsyncDefault(uri,new RoomInformation()
         {
             Id = -1,
             Name = "Ошибка",
             Description = "Кабинет не найден!"
-        });
+        },CancellationToken.None);
         
-        var imageInformation = await _rest.GetAsyncDefault<List<RoomImageInformation>>(imageUri,[]);
+        var imageInformation = await Rest.GetAsyncDefault<List<RoomImageInformation>>(imageUri,[],CancellationToken.None);
         var result = new ResultCabinet(information, imageInformation);
         
         if(information.Id != -1)
             History.Add(result);
         
-        await _bottomSheetCollection.ShowBottomSheet(new ResultBottomSheet(result));
+        await BottomSheetCollection.ShowBottomSheet(new ResultBottomSheet(result));
         
         _isProcessing = false;
         MainThread.BeginInvokeOnMainThread(() =>
@@ -101,56 +102,11 @@ public partial class MainPage : ContentPage
 
     private async void DebugButtonClicked(object? sender, EventArgs e)
     {
-        await _bottomSheetCollection.ShowBottomSheet(new DebugBottomSheet(_debug));
+        await BottomSheetCollection.ShowBottomSheet(new DebugBottomSheet(Debug));
     }
 
     private async void MenuButtonClicked(object? sender, EventArgs e)
     {
-        await _bottomSheetCollection.ShowBottomSheet(new MenuBottomSheet(this));
-    }
-}
-
-public class BottomSheetCollection
-{
-    private readonly Page _page;
-    private readonly List<BottomSheet> _sheetQueue = [];
-    private Window Window => _page.Window!;
-    private BottomSheet? _currentSheet = null;
-    public bool IsSheetsShow => _currentSheet != null;
-    public BottomSheetCollection(Page page)
-    {
-        _page = page;
-    }
-
-    public async Task ShowBottomSheet(BottomSheet bottomSheet)
-    {
-        _sheetQueue.Add(bottomSheet);
-        await EnsureSheet();
-    }
-
-    private async Task EnsureSheet()
-    {
-        if (_sheetQueue.Count <= 0 || _currentSheet is not null) return;
-        
-        await SetSheet(_sheetQueue[0]);
-        _sheetQueue.RemoveAt(0);
-    }
-
-    private async Task SetSheet(BottomSheet bottomSheet)
-    {
-        _currentSheet = bottomSheet;
-        _currentSheet.HasHandle = true;
-        _currentSheet.Dismissed += CurrentSheetDismissed;
-        
-        await MainThread.InvokeOnMainThreadAsync(async () =>
-            await _currentSheet.ShowAsync(Window)
-        );
-    }
-
-    private async void CurrentSheetDismissed(object? sender, DismissOrigin e)
-    {
-        _currentSheet!.Dismissed -= CurrentSheetDismissed;
-        _currentSheet = null;
-        await EnsureSheet();
+        await BottomSheetCollection.ShowBottomSheet(new MenuBottomSheet(this));
     }
 }

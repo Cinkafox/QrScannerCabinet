@@ -19,7 +19,7 @@ public class AuthController : ControllerBase
     {
         if (_authManager.TryAuth(login, password, out var guid))
         {
-            return guid.ToString();
+            return $"\"{guid.ToString()}\""; //JSON Serializer purpose
         }
         
         Response.StatusCode = 401;
@@ -35,7 +35,7 @@ public class AuthController : ControllerBase
             return guid.ToString();
         }
 
-        Response.StatusCode = 403;
+        Response.StatusCode = 401;
         
         return string.Empty;
     }
@@ -45,10 +45,10 @@ public class AuthController : ControllerBase
     {
         if (_authManager.TryGetUserByUid(token, out var login))
         {
-            return login;
+            return $"\"{login}\""; //JSON Serializer purpose
         }
 
-        Response.StatusCode = 404;
+        Response.StatusCode = 401;
         
         return string.Empty;
     }

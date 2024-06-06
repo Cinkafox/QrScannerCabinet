@@ -56,11 +56,18 @@
       <MauiXaml Update="BottomSheets\ResultBottomSheet.xaml">
         <SubType>Designer</SubType>
       </MauiXaml>
+      <MauiXaml Update="BottomSheets\AuthBottomSheet.xaml">
+        <SubType>Designer</SubType>
+      </MauiXaml>
     </ItemGroup>
 
     <ItemGroup>
       <Compile Update="BottomSheets\ResultBottomSheet.xaml.cs">
         <DependentUpon>ResultBottomSheet.xaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="BottomSheets\AuthBottomSheet.xaml.cs">
+        <DependentUpon>AddCavinetBottomSheet.xaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
     </ItemGroup>

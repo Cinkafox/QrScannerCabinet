@@ -4,7 +4,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="QRScanner.Views.CabinetMiniView">
     <HorizontalStackLayout>
-        <Label x:Name="NumberLabel"/>
-        <Label x:Name="NameLabel"/>
+        <Label Text="Кабинет:" VerticalTextAlignment="Center" FontSize="20"/>
+        <Label x:Name="NumberLabel" VerticalTextAlignment="Center" FontSize="20"/>
+        <Label Text="Название:" Margin="5,0,0,0" VerticalTextAlignment="Center" FontSize="20"/>
+        <Label x:Name="NameLabel" VerticalTextAlignment="Center" FontSize="20"/>
+        <Button Text="I" Margin="15,0,0,0" FontSize="20" Clicked="InfoButtonClicked"/>
     </HorizontalStackLayout>
 </ContentView>

@@ -15,4 +15,9 @@ public partial class CabinetMiniView : ContentView
         NumberLabel.Text = cabinet.Information.Id.ToString();
         NameLabel.Text = cabinet.Information.Name;
     }
+
+    private void InfoButtonClicked(object? sender, EventArgs e)
+    {
+        
+    }
 }
