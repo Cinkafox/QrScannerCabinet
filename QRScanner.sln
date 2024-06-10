@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRServer", "QRServer\QRServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRDataBase", "QRDataBase\QRDataBase.csproj", "{A7929985-FB77-460F-AAE6-D0C4655FC806}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRTest", "QRTest\QRTest.csproj", "{69592A26-EABD-4683-9E4E-3D8B077DDB25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,5 +28,9 @@ Global
 		{A7929985-FB77-460F-AAE6-D0C4655FC806}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7929985-FB77-460F-AAE6-D0C4655FC806}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7929985-FB77-460F-AAE6-D0C4655FC806}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69592A26-EABD-4683-9E4E-3D8B077DDB25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69592A26-EABD-4683-9E4E-3D8B077DDB25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69592A26-EABD-4683-9E4E-3D8B077DDB25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69592A26-EABD-4683-9E4E-3D8B077DDB25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,6 +1,6 @@
-namespace QRServer.Auth;
+namespace QRServer.Services.AuthProvider;
 
-public class TestAuthProvider : IAuthDataProvider
+public class LocalAuthProvider : IAuthDataProvider
 {
     public Dictionary<string, string> LocalSession = new();
     

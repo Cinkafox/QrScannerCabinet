@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using QRServer.Auth;
-using QRShared;
+using QRServer.Services;
+using QRShared.Datum;
 
 namespace QRServer.Controllers.Auth;
 
@@ -8,17 +8,17 @@ namespace QRServer.Controllers.Auth;
 [Route("[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly AuthManager _authManager;
+    private readonly AuthService _authService;
     
-    public AuthController(AuthManager authManager)
+    public AuthController(AuthService authService)
     {
-        _authManager = authManager;
+        _authService = authService;
     }
 
     [HttpPost]
     public IActionResult GetToken(UserInformation userInformation)
     {
-        if (_authManager.TryAuth(userInformation.Login, userInformation.Password, out var guid))
+        if (_authService.TryAuth(userInformation.Login, userInformation.Password, out var guid))
             return Ok(guid);
         
         return Unauthorized();
@@ -27,7 +27,7 @@ public class AuthController : ControllerBase
     [HttpPost("Register")]
     public IActionResult GenToken(UserInformation userInformation)
     {
-        if (_authManager.Register(userInformation.Login, userInformation.Password, out var guid))
+        if (_authService.Register(userInformation.Login, userInformation.Password, out var guid))
             return Ok(guid);
         
         return Unauthorized();
@@ -36,7 +36,7 @@ public class AuthController : ControllerBase
     [HttpGet]
     public IActionResult GetUser(string token)
     {
-        if (_authManager.TryGetUserByUid(token, out var login))
+        if (_authService.TryGetUserByUid(token, out var login))
             return Ok(login); 
         
         return Unauthorized();

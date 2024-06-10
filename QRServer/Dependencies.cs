@@ -1,5 +1,8 @@
+using QRDataBase;
 using QRDataBase.Providers;
-using QRServer.Auth;
+using QRServer.Services;
+using QRServer.Services.AuthProvider;
+using QRServer.Services.TokenProvider;
 
 namespace QRServer;
 
@@ -7,8 +10,16 @@ public static class Dependencies
 {
     public static void Register(WebApplicationBuilder builder)
     {
+        builder.Services.AddSingleton<ITokenProvider, LocalTokenProvider>();
         builder.Services.AddSingleton<IDataBaseProvider,MySqlDBProvider>();
         builder.Services.AddSingleton<IAuthDataProvider,DataBaseAuthProvider>();
-        builder.Services.AddSingleton<AuthManager>();
+        builder.Services.AddSingleton<AuthService>();
+    }
+
+    public static void ConnectDataBase(WebApplication app)
+    {
+        var configuration = app.Services.GetService<IConfiguration>()!;
+        var option = configuration.GetSection("DataBase").Get<DataBaseOption>()!;
+        app.Services.GetService<IDataBaseProvider>()?.Connect(option);
     }
 }

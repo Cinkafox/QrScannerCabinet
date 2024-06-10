@@ -1,4 +1,4 @@
-using QRShared;
+using QRShared.Datum;
 using The49.Maui.BottomSheet;
 
 namespace QRScanner.BottomSheets;

@@ -1,0 +1,10 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6200e2ee_002D5c2b_002D4f38_002Db0a4_002Dc6875e4b1a39/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="TokenProviderTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.Tokens.TokenProviderTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.Data.DataBase.Test&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.Auth.AuthProviderTest.LocalTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.Auth.AuthProviderTest.DataBaseTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.DataBase.DataBase&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

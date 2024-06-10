@@ -1,9 +1,8 @@
-using QRDataBase;
 using QRDataBase.Filter;
 using QRDataBase.Providers;
-using QRShared;
+using QRShared.Datum;
 
-namespace QRServer.Auth;
+namespace QRServer.Services.AuthProvider;
 
 public class DataBaseAuthProvider : IAuthDataProvider
 {

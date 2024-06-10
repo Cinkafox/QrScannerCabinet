@@ -1,4 +1,5 @@
 using QRDataBase;
+using QRDataBase.Providers;
 using QRServer;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,4 +22,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+Dependencies.ConnectDataBase(app);
 app.Run();
+

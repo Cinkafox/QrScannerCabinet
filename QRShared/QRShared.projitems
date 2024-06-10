@@ -15,5 +15,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Datum\RoomImageInformation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Datum\RoomInformation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Datum\UserInformation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Datum\TokenInformation.cs"/>
   </ItemGroup>
 </Project>

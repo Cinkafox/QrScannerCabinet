@@ -2,19 +2,15 @@ using System.Data;
 using System.Reflection;
 using MySql.Data.MySqlClient;
 using QRDataBase.Filter;
-using QRShared;
 using QRShared.DataBase.Attributes;
+using QRShared.Datum;
+using QRShared.Datum.DataBase.Attributes;
 
 namespace QRDataBase.Providers;
 
 public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
 {
     private MySqlConnection _mySqlConnection = default!;
-    
-    public MySqlDBProvider()
-    {
-        Connect(Config.ConnectionOption);
-    }
     
     public void Connect(DataBaseOption option)
     {

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using QRDataBase.Filter;
 using QRDataBase.Providers;
-using QRServer.Auth;
-using QRShared;
+using QRServer.Services;
+using QRShared.Datum;
 
 namespace QRServer.Controllers.Room;
 
@@ -11,12 +11,12 @@ namespace QRServer.Controllers.Room;
 public class RoomInformationController : ControllerBase
 {
     private readonly IDataBaseProvider _provider;
-    private readonly AuthManager _authManager;
+    private readonly AuthService _authService;
 
-    public RoomInformationController(IDataBaseProvider provider, AuthManager authManager)
+    public RoomInformationController(IDataBaseProvider provider, AuthService authService)
     {
         _provider = provider;
-        _authManager = authManager;
+        _authService = authService;
     }
     
     [HttpGet("{id:long}",Name = "GetRoomInformation")]
@@ -37,7 +37,7 @@ public class RoomInformationController : ControllerBase
     [HttpPost(Name = "AddRoomInformation")]
     public bool Post(RoomInformation room, string token, bool overrideValue = false)
     {
-        if (!_authManager.HasAuthed(token))
+        if (!_authService.HasAuthed(token))
         {
             Response.StatusCode = 401;
             return false;
@@ -50,7 +50,7 @@ public class RoomInformationController : ControllerBase
     [HttpDelete("{id:long}",Name = "DeleteRoomInformation")]
     public bool Delete(long id,string token)
     {
-        if (!_authManager.HasAuthed(token))
+        if (!_authService.HasAuthed(token))
         {
             Response.StatusCode = 401;
             return false;
@@ -71,7 +71,7 @@ public class RoomInformationController : ControllerBase
     [HttpPost("Images",Name = "AddRoomImageInformation")]
     public bool PostImage(RoomImageInformation room,string token)
     {
-        if (!_authManager.HasAuthed(token))
+        if (!_authService.HasAuthed(token))
         {
             Response.StatusCode = 401;
             return false;
@@ -84,7 +84,7 @@ public class RoomInformationController : ControllerBase
     [HttpDelete("Images/{id:long}",Name = "DeleteRoomImageInformation")]
     public bool DeleteImage(long id,string token)
     {
-        if (!_authManager.HasAuthed(token))
+        if (!_authService.HasAuthed(token))
         {
             Response.StatusCode = 401;
             return false;

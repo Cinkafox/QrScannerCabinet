@@ -1,7 +1,8 @@
 #nullable enable
 using QRShared.DataBase.Attributes;
+using QRShared.Datum.DataBase.Attributes;
 
-namespace QRShared;
+namespace QRShared.Datum;
 
 public class UserInformation
 {

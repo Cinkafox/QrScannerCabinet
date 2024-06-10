@@ -16,4 +16,8 @@
       <ProjectReference Include="..\QRDataBase\QRDataBase.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Auth\" />
+    </ItemGroup>
+
 </Project>

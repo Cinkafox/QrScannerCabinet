@@ -1,4 +1,4 @@
-namespace QRServer.Auth;
+namespace QRServer.Services.AuthProvider;
 
 public interface IAuthDataProvider
 {

@@ -1,15 +1,17 @@
-namespace QRServer.Auth;
+using QRServer.Services.AuthProvider;
+using QRServer.Services.TokenProvider;
 
-public class AuthManager
+namespace QRServer.Services;
+
+public class AuthService
 {
-    private readonly Dictionary<Guid, DateTime> _authList = new();
-    private readonly Dictionary<Guid, string> _users = new();
-    
     private IAuthDataProvider _authDataProvider;
+    private ITokenProvider _tokenProvider;
 
-    public AuthManager(IAuthDataProvider authDataProvider)
+    public AuthService(IAuthDataProvider authDataProvider,ITokenProvider tokenProvider)
     {
         _authDataProvider = authDataProvider;
+        _tokenProvider = tokenProvider;
     }
 
     public bool TryAuth(string login, string password, out Guid guid)
@@ -19,17 +21,15 @@ public class AuthManager
             guid = Guid.Empty;
             return false;
         }
-        
-        guid = Guid.NewGuid();
-        _authList.Add(guid,DateTime.Now + new TimeSpan(0,0,30,0));
-        _users.Add(guid, login);
+
+        guid = _tokenProvider.Add(login);
         return true;
     }
 
     public bool HasAuthed(Guid guid)
     {
-        return true; //76b2fc4f-8e83-4587-8b12-dd78e4a337eb
-        return _authList.TryGetValue(guid, out var time) && time > DateTime.Now;
+        //return true; //76b2fc4f-8e83-4587-8b12-dd78e4a337eb
+        return _tokenProvider.TryGet(guid, out _);
     }
 
     public bool HasAuthed(string guid)
@@ -50,9 +50,8 @@ public class AuthManager
 
     public bool TryGetUserByUid(Guid guid, out string login)
     {
-        if (_users.TryGetValue(guid, out var value))
+        if (_tokenProvider.TryGet(guid, out login))
         {
-            login = value;
             return true;
         }
 

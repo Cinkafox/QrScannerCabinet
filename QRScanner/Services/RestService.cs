@@ -2,7 +2,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using QRScanner.Utils;
-using QRShared;
+using QRShared.Datum;
 
 namespace QRScanner.Services;
 

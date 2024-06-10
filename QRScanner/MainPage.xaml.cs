@@ -1,7 +1,7 @@
 ﻿using QRScanner.BottomSheets;
 using QRScanner.Services;
 using QRScanner.Utils;
-using QRShared;
+using QRShared.Datum;
 using The49.Maui.BottomSheet;
 using ZXing.Net.Maui;
 using ContentPage = Microsoft.Maui.Controls.ContentPage;

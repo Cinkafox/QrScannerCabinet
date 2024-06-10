@@ -9,11 +9,6 @@ public class MongoDBProvider : IDataBaseProvider
     private MongoClient _client = default!;
     private IMongoDatabase _database = default!;
 
-    public MongoDBProvider()
-    {
-        Connect(Config.ConnectionOption);
-    }
-
     public void Connect(DataBaseOption option)
     {
         _client = new MongoClient(new MongoClientSettings()
