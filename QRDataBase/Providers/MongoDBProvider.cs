@@ -1,8 +1,6 @@
-using MongoDB.Bson;
 using MongoDB.Driver;
 using QRDataBase.Filter;
 using QRDataBase.Filter.Operator;
-using QRShared;
 
 namespace QRDataBase.Providers;
 
@@ -26,10 +24,25 @@ public class MongoDBProvider : IDataBaseProvider
         
         _database = _client.GetDatabase(option.DataBase);
     }
-
-    public List<T> GetInformationById<T>(long id, string idName = "_id")
+    
+    public void Push<T>(T data,bool force = false)
     {
-        return _database.GetCollection<T>(typeof(T).Name).FindSync(new BsonDocument(idName,id)).ToList();
+        _database.GetCollection<T>(typeof(T).Name).InsertOneAsync(data);
+    }
+
+    public List<T> Get<T>(ISearchItem? search = null, int limit = -1)
+    {
+        return _database.GetCollection<T>(typeof(T).Name).FindSync(BuildFilter<T>(search)).ToList();
+    }
+
+    public void Remove<T>(ISearchItem? search = null)
+    {
+        _database.GetCollection<T>(typeof(T).Name).DeleteMany(BuildFilter<T>(search));
+    }
+
+    public bool Has<T>(ISearchItem? search = null)
+    {
+        return Get<T>().Count > 0;
     }
 
     public void Dispose()
@@ -98,15 +111,5 @@ public class MongoDBProvider : IDataBaseProvider
             default:
                 throw new ArgumentOutOfRangeException();
         }
-    }
-
-    public void Push<T>(T data)
-    {
-        _database.GetCollection<T>(typeof(T).Name).InsertOneAsync(data);
-    }
-
-    public List<T> Get<T>(ISearchItem? search = null)
-    {
-        return _database.GetCollection<T>(typeof(T).Name).FindSync(BuildFilter<T>(search)).ToList();
     }
 }

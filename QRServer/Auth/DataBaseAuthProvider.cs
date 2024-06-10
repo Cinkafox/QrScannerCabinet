@@ -40,10 +40,3 @@ public class DataBaseAuthProvider : IAuthDataProvider
         return true;
     }
 }
-
-public class UserInformation
-{
-    [PrimaryKey]
-    public string Login { get; init; } = string.Empty;
-    public string Password { get; init; } = string.Empty;
-}

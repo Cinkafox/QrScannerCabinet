@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using QRServer.Auth;
+using QRShared;
 
 namespace QRServer.Controllers.Auth;
 
@@ -14,42 +15,30 @@ public class AuthController : ControllerBase
         _authManager = authManager;
     }
 
-    [HttpGet("Login")]
-    public string GetToken(string login, string password)
+    [HttpPost]
+    public IActionResult GetToken(UserInformation userInformation)
     {
-        if (_authManager.TryAuth(login, password, out var guid))
-        {
-            return $"\"{guid.ToString()}\""; //JSON Serializer purpose
-        }
+        if (_authManager.TryAuth(userInformation.Login, userInformation.Password, out var guid))
+            return Ok(guid);
         
-        Response.StatusCode = 401;
-        
-        return string.Empty;
+        return Unauthorized();
     }
     
-    [HttpGet("Register")]
-    public string GenToken(string login, string password)
+    [HttpPost("Register")]
+    public IActionResult GenToken(UserInformation userInformation)
     {
-        if (_authManager.Register(login, password, out var guid))
-        {
-            return guid.ToString();
-        }
-
-        Response.StatusCode = 401;
+        if (_authManager.Register(userInformation.Login, userInformation.Password, out var guid))
+            return Ok(guid);
         
-        return string.Empty;
+        return Unauthorized();
     }
 
     [HttpGet]
-    public string GetUser(string token)
+    public IActionResult GetUser(string token)
     {
         if (_authManager.TryGetUserByUid(token, out var login))
-        {
-            return $"\"{login}\""; //JSON Serializer purpose
-        }
-
-        Response.StatusCode = 401;
+            return Ok(login); 
         
-        return string.Empty;
+        return Unauthorized();
     }
 }

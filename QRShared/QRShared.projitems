@@ -9,6 +9,11 @@
     <Import_RootNamespace>QRShared</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)RoomInformation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBase\Attributes\AutoIncrementAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBase\Attributes\PrimaryKeyAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DataBase\Attributes\ValueNotNullAttribute.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Datum\RoomImageInformation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Datum\RoomInformation.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Datum\UserInformation.cs" />
   </ItemGroup>
 </Project>

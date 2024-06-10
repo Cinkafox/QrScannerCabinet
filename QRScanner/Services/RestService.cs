@@ -24,20 +24,12 @@ public class RestService
     public async Task<RestResult<T>> GetAsync<T>(Uri uri,CancellationToken cancellationToken, Guid? token = null)
     {
         if (token is not null)
-            uri = uri.AddParameter(nameof(token), token.ToString());
+            uri = uri.AddParameter(nameof(token), token.Value.ToString());
         
         try
         {
             var response = await _client.GetAsync(uri,cancellationToken);
-            if (response.IsSuccessStatusCode)
-            {
-                var content = await response.Content.ReadAsStringAsync();
-                _debug.Debug($"SUCCESSFUL GET CONTENT {typeof(T)} URL {uri} {content}");
-                return new RestResult<T>(JsonSerializer.Deserialize<T>(content, _serializerOptions),null,response.StatusCode);
-            }
-
-            _debug.Error("ERROR " + response.StatusCode + " " + uri);
-            return new RestResult<T>(default, "response code:" + response.StatusCode,response.StatusCode);
+            return await ReadResult<T>(response,cancellationToken);
         }
         catch (Exception ex)
         {
@@ -52,26 +44,57 @@ public class RestService
         return result.Value ?? defaultValue;
     }
     
-    public async Task<bool> AddAsync<T>(T information,Uri uri,CancellationToken cancellationToken, Guid? token = null) where T: BaseInformation
+    public async Task<RestResult<K>> PostAsync<K,T>(T information,Uri uri,CancellationToken cancellationToken, Guid? token = null) 
     {
         if (token is not null)
-            uri = uri.AddParameter(nameof(token), token.ToString());
+            uri = uri.AddParameter(nameof(token), token.Value.ToString());
         
         try
         {
-            var json = JsonSerializer.Serialize(information, _serializerOptions);
+            var json = JsonSerializer.Serialize<T>(information, _serializerOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-            
             var response = await _client.PostAsync(uri, content,cancellationToken);
-            if (response.IsSuccessStatusCode)
-                return true;
+            return await ReadResult<K>(response,cancellationToken);
         }
         catch (Exception ex)
         {
             _debug.Debug("ERROR " + ex.Message);
+            return new RestResult<K>(default, ex.Message,HttpStatusCode.RequestTimeout);
+        }
+    }
+
+    public async Task<RestResult<T>> PostAsync<T>(Stream stream, Uri uri, CancellationToken cancellationToken, Guid? token = null)
+    {
+        if (token is not null)
+            uri = uri.AddParameter(nameof(token), token.Value.ToString());
+
+        try
+        {
+            var content = new StreamContent(stream);
+            var response = await _client.PostAsync(uri, content,cancellationToken);
+            return await ReadResult<T>(response,cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _debug.Debug("ERROR " + ex.Message);
+            return new RestResult<T>(default, ex.Message,HttpStatusCode.RequestTimeout);
+        }
+    }
+    
+    private async Task<RestResult<T>> ReadResult<T>(HttpResponseMessage response,CancellationToken cancellationToken)
+    {
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            _debug.Debug($"SUCCESSFUL GET CONTENT {typeof(T)} {content}");
+            if (typeof(T) == typeof(RawResult))
+                return (new RestResult<RawResult>(new RawResult(content),null,response.StatusCode) as RestResult<T>)!;
+            
+            return new RestResult<T>(JsonSerializer.Deserialize<T>(content, _serializerOptions),null,response.StatusCode);
         }
 
-        return false;
+        _debug.Error("ERROR " + response.StatusCode);
+        return new RestResult<T>(default, "response code:" + response.StatusCode,response.StatusCode);
     }
 }
 
@@ -91,4 +114,16 @@ public class RestResult<T>
     }
 
     public static implicit operator T?(RestResult<T> result) => result.Value;
+}
+
+public class RawResult
+{
+    public string Result;
+
+    public RawResult(string result)
+    {
+        Result = result;
+    }
+    
+    public static implicit operator string(RawResult result) => result.Result;
 }

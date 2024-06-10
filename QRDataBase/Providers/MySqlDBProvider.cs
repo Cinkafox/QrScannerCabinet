@@ -1,7 +1,9 @@
+using System.Data;
 using System.Reflection;
 using MySql.Data.MySqlClient;
 using QRDataBase.Filter;
 using QRShared;
+using QRShared.DataBase.Attributes;
 
 namespace QRDataBase.Providers;
 
@@ -23,27 +25,34 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
         _mySqlConnection.Open();
     }
     
-    public void Push<T>(T information)
+    public void Push<T>(T information,bool force = false)
     {
         CreateTableIfNotExist<T>();
 
         using var command = _mySqlConnection.CreateCommand();
-        DeRar(information, command);
+        var insertCommand = "INSERT INTO";
+        if (Has<T>(GetKeyProperty(information)))
+        {
+            if(!force) return;
+            insertCommand = "REPLACE INTO";
+        }
+        
+        CreateInsertCommand(information, command, insertCommand);
         command.ExecuteNonQuery();
     }
 
-    public List<T> Get<T>(ISearchItem? search = null)
+    public List<T> Get<T>(ISearchItem? search = null, int limit = -1)
     {
         CreateTableIfNotExist<T>();
         var objList = new List<T>();
         
         using var command = _mySqlConnection.CreateCommand();
         command.CommandText = "SELECT * FROM " + typeof(T).Name;
-        if (search is not null)
-        {
-            command.CommandText += $" WHERE {search}";
-        }
-      
+        ExtendSearch(command,search);
+        
+        if (limit > 0)
+            command.CommandText += $" limit {limit}";
+        
         using var reader = command.ExecuteReader();
         while (reader.Read())
         {
@@ -52,7 +61,43 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
 
         return objList;
     }
-    
+
+    public void Remove<T>(ISearchItem? search = null)
+    {
+        CreateTableIfNotExist<T>();
+        using var command = _mySqlConnection.CreateCommand();
+        command.CommandText = "DELETE FROM " + typeof(T).Name;
+        ExtendSearch(command,search);
+
+        command.ExecuteNonQuery();
+    }
+
+    public bool Has<T>(ISearchItem? search = null)
+    {
+        return Get<T>(search,1).Count > 0;
+    }
+
+    private ISearchItem? GetKeyProperty<T>(T obj)
+    {
+        var type = typeof(T);
+        foreach (var property in type.GetProperties())
+        {
+            if (property.GetCustomAttribute<PrimaryKeyAttribute>() is null) continue;
+            var value = property.GetValue(obj);
+            return new DbKeyValue(property.Name, value!);
+        }
+
+        return null;
+    }
+
+    private void ExtendSearch(IDbCommand command, ISearchItem? search)
+    {
+        if (search is not null)
+        {
+            command.CommandText += $" WHERE {search}";
+        }
+    }
+
     private string GetSqlType(Type type)
     {
         if (type == typeof(string))
@@ -65,7 +110,7 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
             return "INT";
         }
 
-        throw new Exception("OBOSRALIS");
+        throw new Exception();
     }
     
     private T Parse<T>(MySqlDataReader reader)
@@ -73,25 +118,40 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
         var instance = Activator.CreateInstance<T>();
         var type = typeof(T);
         
-        foreach (var field in type.GetProperties())
+        foreach (var property in type.GetProperties())
         {
-            var value = reader[field.Name];
-            field.SetValue(instance,value);
+            var value = reader[property.Name];
+            property.SetValue(instance,value);
         }
 
         return instance;
     }
 
-    private void DeRar<T>(T value, MySqlCommand command)
+    private void CreateInsertCommand<T>(T value, IDbCommand command,string insertCommand = "INSERT INTO")
     {
-        command.CommandText = "INSERT INTO " + typeof(T).Name + " VALUES (";
+        var propertyList = new List<string>();
+        var valueList = new List<string>();
         
-        foreach (var field in typeof(T).GetProperties())
+        foreach (var property in typeof(T).GetProperties())
         {
-            command.CommandText += $"{MySqlHelper.Stringify(field.GetValue(value)!)}, ";
+            if (property.GetCustomAttribute<AutoIncrementAttribute>() is not null)
+            {
+                continue;   
+            }
+
+            var propValue = property.GetValue(value);
+            if (propValue is null)
+            {
+                if (property.GetCustomAttribute<ValueNotNullAttribute>() is not null)
+                    throw new ArgumentNullException(property.Name);
+                continue;
+            }
+            
+            propertyList.Add(property.Name);
+            valueList.Add(MySqlHelper.Stringify(propValue));
         }
-        command.CommandText = command.CommandText.Remove(command.CommandText.Length - 2, 2);
-        command.CommandText += ")";
+        
+        command.CommandText = $"{insertCommand} {typeof(T).Name} ({string.Join(',',propertyList)}) VALUES ({string.Join(',',valueList)})" ;
     }
 
     private void CreateTableIfNotExist<T>()
@@ -102,14 +162,19 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
             
             var primary = "Id";
             
-            foreach (var field in typeof(T).GetProperties())
+            foreach (var property in typeof(T).GetProperties())
             {
-                if (field.GetCustomAttribute<PrimaryKeyAttribute>() is { } primaryKeyAttribute)
-                {
-                    primary = field.Name;
-                }
+                var args = "";
+                if (property.GetCustomAttribute<PrimaryKeyAttribute>() is not null)
+                    primary = property.Name;
+
+                if (property.GetCustomAttribute<AutoIncrementAttribute>() is not null)
+                    args += " AUTO_INCREMENT";
+
+                if (property.GetCustomAttribute<ValueNotNullAttribute>() is not null)
+                    args += " NOT NULL";
                 
-                command.CommandText += $"`{field.Name}` {GetSqlType(field.PropertyType)}, ";
+                command.CommandText += $"`{property.Name}` {GetSqlType(property.PropertyType)}{args},";
             }
 
             command.CommandText += $"PRIMARY KEY (`{primary}`))";
