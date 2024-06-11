@@ -22,7 +22,7 @@ public class RoomInformationController : ControllerBase
     [HttpGet("{id:long}",Name = "GetRoomInformation")]
     public RoomInformation Get(long id)
     {
-        var room = _provider.Get<RoomInformation>(new DbKeyValue("Id", id.ToString()),1);
+        var room = _provider.Get<RoomInformation>(new DbKeyValue("Id", id),1);
         if (room.Count > 0) return room[0];
         Response.StatusCode = 404;
 
@@ -56,7 +56,7 @@ public class RoomInformationController : ControllerBase
             return false;
         }
         
-        _provider.Remove<RoomInformation>(new DbKeyValue("Id",id.ToString()));
+        _provider.Remove<RoomInformation>(new DbKeyValue("Id",id));
         return true;
     }
     
@@ -64,7 +64,7 @@ public class RoomInformationController : ControllerBase
     public List<RoomImageInformation> GetImage(long id)
     {
         return _provider.Get<RoomImageInformation>(
-            new DbKeyValue(nameof(RoomImageInformation.RoomId),id.ToString())
+            new DbKeyValue(nameof(RoomImageInformation.RoomId),id)
         );
     }
     
@@ -91,7 +91,7 @@ public class RoomInformationController : ControllerBase
         }
         
         _provider.Remove<RoomImageInformation>(
-            new DbKeyValue("Id",id.ToString())
+            new DbKeyValue(nameof(RoomImageInformation.RoomId),id)
         );
         return true;
     }

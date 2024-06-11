@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using QRServer.Services;
+using QRServer.Services.FileApi;
 
 namespace QRServer.Controllers.Images;
 
@@ -6,14 +8,21 @@ namespace QRServer.Controllers.Images;
 [Route("[controller]")]
 public class ImageController : ControllerBase
 {
-    private readonly IFileApi _fileApi = new LocalFileApi();
+    private readonly IFileApi _fileApi;
     private readonly string _imagePath = "Images";
-    
+    private readonly AuthService _authService;
+
+    public ImageController(IFileApi fileApi, AuthService authService)
+    {
+        _fileApi = fileApi;
+        _authService = authService;
+    }
+
     [HttpGet("{path}")]
     public IActionResult Get(string path)
     {
         if (!Guid.TryParse(path, out _)) 
-            return Forbid();
+            return NotFound();
         
         if (_fileApi.TryOpen(Path.Join(_imagePath,path), out var stream))
         {
@@ -24,10 +33,13 @@ public class ImageController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult Post(IFormFile formFile)
+    public IActionResult Post(IFormFile formFile,string token)
     {
-        if (formFile.ContentType != "image/jpeg") 
-            return Forbid();
+        if (!_authService.HasAuthed(token))
+            return Unauthorized();
+        
+        if (formFile.ContentType != "image/png") 
+            return NoContent();
 
         var fileName = Guid.NewGuid().ToString();
         
@@ -41,37 +53,3 @@ public class ImageController : ControllerBase
     }
 }
 
-public interface IFileApi
-{
-    public Stream Open(string path);
-    public bool TryOpen(string path, out Stream stream);
-    public void Save(Stream stream, string path);
-}
-
-public class LocalFileApi : IFileApi
-{
-    public string RootPath = "bin/";
-    public Stream Open(string path)
-    {
-        return File.OpenRead(Path.Combine(RootPath,path));
-    }
-
-    public bool TryOpen(string path, out Stream stream)
-    {
-        if (File.Exists(Path.Combine(RootPath,path)))
-        {
-            stream = Open(path);
-            return true;
-        }
-        
-        stream = Stream.Null;
-        return false;
-    }
-
-    public void Save(Stream stream, string path)
-    {
-        using var fileStream = File.Open(Path.Combine(RootPath,path),FileMode.OpenOrCreate,FileAccess.Write);
-        stream.CopyTo(fileStream);
-        fileStream.Flush();
-    }
-}

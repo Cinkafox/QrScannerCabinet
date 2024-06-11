@@ -6,6 +6,6 @@ namespace QRShared.Datum;
 public class TokenInformation
 {
     [PrimaryKey]
-    public Guid Token { get; set; }
+    public string Token { get; set; } = String.Empty;
     public string Key { get; set; } = String.Empty;
 }

@@ -6,5 +6,13 @@
     &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.Auth.AuthProviderTest.LocalTest&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.Auth.AuthProviderTest.DataBaseTest&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.DataBase.DataBase&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.Controllers.Auth.TestAuth&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.Controllers.Auth&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.Controllers.Room&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.Controllers.Image.TestLocalLocal&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.Controllers.Image&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.FileApi.FileApiTest.Test&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.FileApi.FileApiTest.TestTemp&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::69592A26-EABD-4683-9E4E-3D8B077DDB25::net8.0::QRTest.Server.FileApi.FileApiTest.TestDB&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

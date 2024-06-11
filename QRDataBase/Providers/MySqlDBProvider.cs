@@ -5,6 +5,7 @@ using QRDataBase.Filter;
 using QRShared.DataBase.Attributes;
 using QRShared.Datum;
 using QRShared.Datum.DataBase.Attributes;
+using MySqlHelper = QRDataBase.Utils.MySqlHelper;
 
 namespace QRDataBase.Providers;
 
@@ -93,21 +94,6 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
             command.CommandText += $" WHERE {search}";
         }
     }
-
-    private string GetSqlType(Type type)
-    {
-        if (type == typeof(string))
-        {
-            return "varchar(255)";
-        }
-
-        if (type == typeof(int) || type == typeof(long))
-        {
-            return "INT";
-        }
-
-        throw new Exception();
-    }
     
     private T Parse<T>(MySqlDataReader reader)
     {
@@ -123,10 +109,9 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
         return instance;
     }
 
-    private void CreateInsertCommand<T>(T value, IDbCommand command,string insertCommand = "INSERT INTO")
+    private void CreateInsertCommand<T>(T value, MySqlCommand command,string insertCommand = "INSERT INTO")
     {
         var propertyList = new List<string>();
-        var valueList = new List<string>();
         
         foreach (var property in typeof(T).GetProperties())
         {
@@ -143,11 +128,37 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
                 continue;
             }
             
+            AddProperty(command,property.Name,propValue);
             propertyList.Add(property.Name);
-            valueList.Add(MySqlHelper.Stringify(propValue));
+            
         }
         
-        command.CommandText = $"{insertCommand} {typeof(T).Name} ({string.Join(',',propertyList)}) VALUES ({string.Join(',',valueList)})" ;
+        command.CommandText = $"{insertCommand} {typeof(T).Name} ({string.Join(',',propertyList)}) VALUES ({string.Join(',',propertyList.Select(a=>"@"+a))})" ;
+    }
+
+    public void AddProperty(MySqlCommand mySqlCommand, string name, object value)
+    {
+        var dbName = "@" + name;
+        switch (value)
+        {
+            case byte[] b:
+                mySqlCommand.Parameters.Add(dbName, MySqlDbType.MediumBlob, b.Length);
+                break;
+            case int:
+                mySqlCommand.Parameters.Add(dbName, MySqlDbType.Int32);
+                break;
+            case long:
+                mySqlCommand.Parameters.Add(dbName, MySqlDbType.Int32);
+                break;
+            case string:
+                mySqlCommand.Parameters.Add(dbName, MySqlDbType.VarChar, 256);
+                break;
+            default:
+                throw new Exception($"{value.GetType()} no type");
+        }
+
+        mySqlCommand.Parameters[dbName].Value = value;
+        
     }
 
     private void CreateTableIfNotExist<T>()
@@ -170,7 +181,7 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
                 if (property.GetCustomAttribute<ValueNotNullAttribute>() is not null)
                     args += " NOT NULL";
                 
-                command.CommandText += $"`{property.Name}` {GetSqlType(property.PropertyType)}{args},";
+                command.CommandText += $"`{property.Name}` {MySqlHelper.GetSqlType(property.PropertyType)}{args},";
             }
 
             command.CommandText += $"PRIMARY KEY (`{primary}`))";

@@ -10,7 +10,10 @@ public class LocalTokenProvider : ITokenProvider
 
     public Guid Add(string key)
     {
-        var guid = Guid.NewGuid();
+        if (_guidList.TryGetValue(key, out var guid)) 
+            return guid;
+        
+        guid = Guid.NewGuid();
         _lifeList.Add(guid,DateTime.Now + TokenLifeTime);
         _keyList.Add(guid,key);
         _guidList.Add(key,guid);

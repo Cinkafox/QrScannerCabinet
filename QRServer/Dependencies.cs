@@ -2,6 +2,7 @@ using QRDataBase;
 using QRDataBase.Providers;
 using QRServer.Services;
 using QRServer.Services.AuthProvider;
+using QRServer.Services.FileApi;
 using QRServer.Services.TokenProvider;
 
 namespace QRServer;
@@ -12,6 +13,7 @@ public static class Dependencies
     {
         builder.Services.AddSingleton<ITokenProvider, LocalTokenProvider>();
         builder.Services.AddSingleton<IDataBaseProvider,MySqlDBProvider>();
+        builder.Services.AddSingleton<IFileApi, DBFileApi>();
         builder.Services.AddSingleton<IAuthDataProvider,DataBaseAuthProvider>();
         builder.Services.AddSingleton<AuthService>();
     }

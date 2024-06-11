@@ -20,7 +20,7 @@ public class DataBaseTokenProvider : ITokenProvider
         _provider.Push(new TokenInformation()
         {
             Key = key,
-            Token = guid
+            Token = guid.ToString()
         },true);
         return guid;
     }
@@ -30,7 +30,7 @@ public class DataBaseTokenProvider : ITokenProvider
         var t = _provider.Get<TokenInformation>(new DbKeyValue(nameof(TokenInformation.Key), key));
         if (t.Count > 0)
         {
-            guid = t[0].Token;
+            guid = Guid.Parse(t[0].Token);
             return true;
         }
 
@@ -46,7 +46,7 @@ public class DataBaseTokenProvider : ITokenProvider
 
     public bool TryGet(Guid guid, out string key)
     {
-        var t = _provider.Get<TokenInformation>(new DbKeyValue(nameof(TokenInformation.Token), guid));
+        var t = _provider.Get<TokenInformation>(new DbKeyValue(nameof(TokenInformation.Token), guid.ToString()));
         if (t.Count > 0)
         {
             key = t[0].Key;

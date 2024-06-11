@@ -22,13 +22,14 @@ public class AuthService
             return false;
         }
 
-        guid = _tokenProvider.Add(login);
+        if(!_tokenProvider.TryGet(login, out guid))
+            guid = _tokenProvider.Add(login);
+        
         return true;
     }
 
     public bool HasAuthed(Guid guid)
     {
-        //return true; //76b2fc4f-8e83-4587-8b12-dd78e4a337eb
         return _tokenProvider.TryGet(guid, out _);
     }
 

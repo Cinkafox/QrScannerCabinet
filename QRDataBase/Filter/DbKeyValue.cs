@@ -1,3 +1,5 @@
+using QRDataBase.Utils;
+
 namespace QRDataBase.Filter;
 
 public class DbKeyValue : ISearchItem
