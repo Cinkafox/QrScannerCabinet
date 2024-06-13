@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <the49:BottomSheet xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:the49="https://schemas.the49.com/dotnet/2023/maui"
-             x:Class="QRScanner.BottomSheets.MenuBottomSheet">
-    
+                   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                   xmlns:the49="https://schemas.the49.com/dotnet/2023/maui"
+                   x:Class="QRScanner.BottomSheets.MenuBottomSheet">
+
     <the49:BottomSheet.Detents>
         <the49:FullscreenDetent />
     </the49:BottomSheet.Detents>
-    
+
     <VerticalStackLayout Margin="15" HorizontalOptions="Fill">
-        <Label Text="Главное меню" FontSize="25" HorizontalTextAlignment="Center"/>
-        
+        <Label Text="Главное меню" FontSize="25" HorizontalTextAlignment="Center" />
+
         <ScrollView>
             <VerticalStackLayout>
-                <Button Text="Менеджер кабинетов" Clicked="AddCabinetButtonClicked"/>
-                
-                <HorizontalStackLayout >
-                    <Label Text="Режим разработчика:" HorizontalTextAlignment="End" VerticalTextAlignment="Center" FontSize="20"/>
-                    <Switch VerticalOptions="Center" x:Name="DevSwitch"/>
+                <Button Text="Менеджер кабинетов" Clicked="AddCabinetButtonClicked" />
+
+                <HorizontalStackLayout>
+                    <Label Text="Режим разработчика:" HorizontalTextAlignment="End" VerticalTextAlignment="Center"
+                           FontSize="20" />
+                    <Switch VerticalOptions="Center" x:Name="DevSwitch" />
                 </HorizontalStackLayout>
-                
+
                 <VerticalStackLayout x:Name="History">
-                    <Label Text="История сканирования:" FontSize="20"/>
+                    <Label Text="История сканирования:" FontSize="20" />
                 </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>
     </VerticalStackLayout>
-    
+
 </the49:BottomSheet>

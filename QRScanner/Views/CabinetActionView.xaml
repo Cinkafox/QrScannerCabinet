@@ -5,12 +5,12 @@
              x:Class="QRScanner.Views.CabinetActionView">
     <VerticalStackLayout Margin="5">
         <VerticalStackLayout x:Name="MainLayout">
-            <Label x:Name="Message"/>
-            <Button Text="Добавить комнату" Clicked="AddButtonClicked"/>
+            <Label x:Name="Message" />
+            <Button Text="Добавить комнату" Clicked="AddButtonClicked" />
             <ScrollView Margin="0,15,0,0">
-                <VerticalStackLayout x:Name="CabinetStack"/>
+                <VerticalStackLayout x:Name="CabinetStack" />
             </ScrollView>
         </VerticalStackLayout>
-        <ScrollView x:Name="AdditionView"/>
+        <ScrollView x:Name="AdditionView" />
     </VerticalStackLayout>
 </ContentView>

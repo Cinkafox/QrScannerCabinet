@@ -6,13 +6,13 @@ namespace QRTest.Server.Auth;
 [TestFixture]
 public class AuthProviderTest
 {
-    private IDataBaseProvider _dataBaseProvider = default!;
-    
     [SetUp]
     public void Setup()
     {
         _dataBaseProvider = new LocalDBProvider();
     }
+
+    private IDataBaseProvider _dataBaseProvider = default!;
 
     [Test]
     public void LocalTest()
@@ -30,9 +30,8 @@ public class AuthProviderTest
 
     public void BaseTest(IAuthDataProvider provider)
     {
-        Assert.That(provider.TryRegister("test","think"));
-        Assert.That(provider.TryGetPassword("test",out var password));
-        Assert.That(password,Is.EqualTo("think"));
+        Assert.That(provider.TryRegister("test", "think"));
+        Assert.That(provider.TryGetPassword("test", out var password));
+        Assert.That(password, Is.EqualTo("think"));
     }
-
 }

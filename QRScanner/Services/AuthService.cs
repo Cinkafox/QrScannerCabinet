@@ -1,28 +1,25 @@
-using System.Collections.Specialized;
-using System.Net;
-using System.Web;
 using QRShared.Datum;
 
 namespace QRScanner.Services;
 
 public class AuthService
 {
-    private readonly RestService _rest;
     private readonly DebugService _debug;
+    private readonly RestService _rest;
     private readonly UriHolderService _uriHolderService;
+
+    public AuthService(RestService rest, DebugService debug, UriHolderService uriHolderService)
+    {
+        _rest = rest;
+        _debug = debug;
+        _uriHolderService = uriHolderService;
+    }
 
     public Guid Token { get; private set; } = Guid.Empty;
     public string? Login { get; private set; }
     public string? Reason { get; private set; }
     public bool IsAuthRequired { get; private set; } = true;
     public bool IsSuccessful { get; private set; }
-
-    public AuthService(RestService rest,DebugService debug, UriHolderService uriHolderService)
-    {
-        _rest = rest;
-        _debug = debug;
-        _uriHolderService = uriHolderService;
-    }
 
     public async Task CheckAuth(CancellationToken cancellationToken)
     {
@@ -31,9 +28,9 @@ public class AuthService
             Reason = "CurrentUri is not set!";
             return;
         }
-        
-        var login = await _rest.GetAsync<string>(_uriHolderService.AuthUri,cancellationToken,Token);
-        
+
+        var login = await _rest.GetAsync<string>(_uriHolderService.AuthUri, cancellationToken, Token);
+
         Login = login.Value;
         Reason = login.Message;
         IsAuthRequired = login.IsAuthRequire;
@@ -47,11 +44,11 @@ public class AuthService
             Reason = "CurrentUri is not set!";
             return;
         }
-        
-        var guid = await _rest.PostAsync<string,UserInformation>(new UserInformation()
+
+        var guid = await _rest.PostAsync<string, UserInformation>(new UserInformation
         {
             Login = login, Password = password
-        },_uriHolderService.AuthUri, cancellationToken);
+        }, _uriHolderService.AuthUri, cancellationToken);
 
         Login = login;
         Reason = guid.Message;
@@ -60,5 +57,5 @@ public class AuthService
 
         if (IsSuccessful)
             Token = parsed;
-    } 
+    }
 }

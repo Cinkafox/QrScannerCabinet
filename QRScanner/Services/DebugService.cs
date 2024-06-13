@@ -2,9 +2,9 @@ namespace QRScanner.Services;
 
 public class DebugService
 {
-    public List<DebugMessage> Messages = new();
-
     public delegate void MessageAppend(DebugMessage debugMessage, DebugService service);
+
+    public List<DebugMessage> Messages = new();
 
     public event MessageAppend? OnMessageAppend;
 
@@ -19,12 +19,12 @@ public class DebugService
 
     public void Debug(string message)
     {
-        AppendMessage(new DebugMessage(MessageStat.DEBG,message));
+        AppendMessage(new DebugMessage(MessageStat.DEBG, message));
     }
 
     public void Error(string message)
     {
-        AppendMessage(new DebugMessage(MessageStat.ERRO,message));
+        AppendMessage(new DebugMessage(MessageStat.ERRO, message));
     }
 }
 
@@ -42,5 +42,7 @@ public struct DebugMessage
 
 public enum MessageStat
 {
-    INFO,ERRO,DEBG
+    INFO,
+    ERRO,
+    DEBG
 }

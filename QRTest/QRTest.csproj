@@ -18,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\QRServer\QRServer.csproj" />
+        <ProjectReference Include="..\QRServer\QRServer.csproj"/>
     </ItemGroup>
 
 </Project>

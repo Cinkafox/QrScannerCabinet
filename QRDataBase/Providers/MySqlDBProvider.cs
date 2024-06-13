@@ -1,10 +1,8 @@
 using System.Data;
 using System.Reflection;
-using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using QRDataBase.Filter;
 using QRShared.DataBase.Attributes;
-using QRShared.Datum;
 using QRShared.Datum.DataBase.Attributes;
 using MySqlHelper = QRDataBase.Utils.MySqlHelper;
 
@@ -13,36 +11,30 @@ namespace QRDataBase.Providers;
 public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
 {
     private MySqlConnection _mySqlConnection = default!;
-    
+
+    public async ValueTask DisposeAsync()
+    {
+        await _mySqlConnection.DisposeAsync();
+    }
+
     public void Connect(DataBaseOption option)
     {
-        _mySqlConnection = new MySqlConnection(new MySqlConnectionStringBuilder()
+        _mySqlConnection = new MySqlConnection(new MySqlConnectionStringBuilder
         {
-            Server = option.Ip, Port = (uint)option.Port, Database = option.DataBase, UserID = option.Login, Password = option.Password
+            Server = option.Ip, Port = (uint)option.Port, Database = option.DataBase, UserID = option.Login,
+            Password = option.Password, CharacterSet = "utf8"
         }.ConnectionString);
         _mySqlConnection.Open();
     }
-    
-    private void strObj(object? data)
-    {
-        if(data == null) return;
-        foreach (var prop in data.GetType().GetProperties())
-        {
-            Console.WriteLine(prop.Name + " = " + prop.GetValue(data));
-        }
-    }
-    
-    public void Push<T>(T information,bool force = false)
+
+    public void Push<T>(T information, bool force = false)
     {
         CreateTableIfNotExist<T>();
-        Console.WriteLine("PUSHING " + force);
-        strObj(information);
-        
+
         if (Has<T>(GetKeyProperty(information)))
-        {
-            if(!force) return;
-        }
-        
+            if (!force)
+                return;
+
         using var command = _mySqlConnection.CreateCommand();
         CreateInsertCommand(information, command, force);
         command.ExecuteNonQuery();
@@ -52,21 +44,16 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
     {
         CreateTableIfNotExist<T>();
         var objList = new List<T>();
-        
-        Console.WriteLine("GETTING " + search);
-        
+
         using var command = _mySqlConnection.CreateCommand();
         command.CommandText = "SELECT * FROM " + typeof(T).Name;
-        ExtendSearch(command,search);
-        
+        ExtendSearch(command, search);
+
         if (limit > 0)
             command.CommandText += $" limit {limit}";
-        
+
         using var reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-            objList.Add(Parse<T>(reader));
-        }
+        while (reader.Read()) objList.Add(Parse<T>(reader));
 
         return objList;
     }
@@ -76,14 +63,19 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
         CreateTableIfNotExist<T>();
         using var command = _mySqlConnection.CreateCommand();
         command.CommandText = "DELETE FROM " + typeof(T).Name;
-        ExtendSearch(command,search);
+        ExtendSearch(command, search);
 
         command.ExecuteNonQuery();
     }
 
     public bool Has<T>(ISearchItem? search = null)
     {
-        return Get<T>(search,1).Count > 0;
+        return Get<T>(search, 1).Count > 0;
+    }
+
+    public void Dispose()
+    {
+        _mySqlConnection.Dispose();
     }
 
     private ISearchItem? GetKeyProperty<T>(T obj)
@@ -101,36 +93,33 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
 
     private void ExtendSearch(IDbCommand command, ISearchItem? search)
     {
-        if (search is not null)
-        {
-            command.CommandText += $" WHERE {search}";
-        }
+        if (search is not null) command.CommandText += $" WHERE {search}";
     }
-    
+
     private T Parse<T>(MySqlDataReader reader)
     {
         var instance = Activator.CreateInstance<T>();
         var type = typeof(T);
-        
+
         foreach (var property in type.GetProperties())
         {
             var value = reader[property.Name];
-            property.SetValue(instance,value);
+            property.SetValue(instance, value);
         }
 
         return instance;
     }
 
-    private void CreateInsertCommand<T>(T value, MySqlCommand command,bool force = false)
+    private void CreateInsertCommand<T>(T value, MySqlCommand command, bool force = false)
     {
         var propertyList = new List<string>();
         var insertCommand = "INSERT INTO";
-        if(force) insertCommand = "REPLACE INTO";
-        
+        if (force) insertCommand = "REPLACE INTO";
+
         foreach (var property in typeof(T).GetProperties())
         {
             if (property.GetCustomAttribute<AutoIncrementAttribute>() is not null && !force)
-                continue;   
+                continue;
 
             var propValue = property.GetValue(value);
             if (propValue is null)
@@ -139,13 +128,13 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
                     throw new ArgumentNullException(property.Name);
                 continue;
             }
-            
-            AddProperty(command,property.Name,propValue);
+
+            AddProperty(command, property.Name, propValue);
             propertyList.Add(property.Name);
-            
         }
-        
-        command.CommandText = $"{insertCommand} {typeof(T).Name} ({string.Join(',',propertyList)}) VALUES ({string.Join(',',propertyList.Select(a=>"@"+a))})" ;
+
+        command.CommandText =
+            $"{insertCommand} {typeof(T).Name} ({string.Join(',', propertyList)}) VALUES ({string.Join(',', propertyList.Select(a => "@" + a))})";
     }
 
     public void AddProperty(MySqlCommand mySqlCommand, string name, object value)
@@ -170,7 +159,6 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
         }
 
         mySqlCommand.Parameters[dbName].Value = value;
-        
     }
 
     private void CreateTableIfNotExist<T>()
@@ -178,9 +166,9 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
         using (var command = _mySqlConnection.CreateCommand())
         {
             command.CommandText = "CREATE TABLE IF NOT EXISTS " + typeof(T).Name + " (";
-            
+
             var primary = "Id";
-            
+
             foreach (var property in typeof(T).GetProperties())
             {
                 var args = "";
@@ -192,22 +180,12 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
 
                 if (property.GetCustomAttribute<ValueNotNullAttribute>() is not null)
                     args += " NOT NULL";
-                
+
                 command.CommandText += $"`{property.Name}` {MySqlHelper.GetSqlType(property.PropertyType)}{args},";
             }
 
             command.CommandText += $"PRIMARY KEY (`{primary}`))";
             command.ExecuteNonQuery();
         }
-    }
-
-    public void Dispose()
-    {
-        _mySqlConnection.Dispose();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await _mySqlConnection.DisposeAsync();
     }
 }

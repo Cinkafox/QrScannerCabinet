@@ -14,12 +14,9 @@ public partial class DebugBottomSheet : BottomSheet
     {
         _debugService = debugService;
         InitializeComponent();
-        
-        foreach (var message in debugService.Messages)
-        {
-            AddMessage(message);
-        }
-        
+
+        foreach (var message in debugService.Messages) AddMessage(message);
+
         Dismissed += OnDismissed;
         debugService.OnMessageAppend += DebugServiceOnOnMessageAppend;
     }
@@ -36,7 +33,7 @@ public partial class DebugBottomSheet : BottomSheet
             Message = message,
             BackgroundColor = _messageCount % 2 == 0 ? Colors.DarkSlateGray : Colors.DimGray
         };
-        
+
         Messages.Add(messageView);
 
         _messageCount++;

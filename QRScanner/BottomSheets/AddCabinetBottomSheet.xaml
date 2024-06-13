@@ -7,9 +7,7 @@
     <the49:BottomSheet.Detents>
         <the49:FullscreenDetent />
     </the49:BottomSheet.Detents>
-    
-    <ScrollView x:Name = "ViewContainer">
-        
-    </ScrollView>
-    
+
+    <ScrollView x:Name="ViewContainer" />
+
 </the49:BottomSheet>

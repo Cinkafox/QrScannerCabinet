@@ -5,13 +5,13 @@ namespace QRServer.Services.FileApi;
 public class TempFileApi : IFileApi
 {
     public Dictionary<string, Stream> Streams = new();
-    
+
     public Stream Open(string path)
     {
         return TryOpen(path, out var stream) ? stream : Stream.Null;
     }
 
-    public bool TryOpen(string path,[NotNullWhen(true)] out Stream? stream)
+    public bool TryOpen(string path, [NotNullWhen(true)] out Stream? stream)
     {
         if (Streams.TryGetValue(path, out var oristream))
         {

@@ -5,24 +5,22 @@
              x:Class="QRScanner.Views.CabinetEditView">
     <ScrollView>
         <VerticalStackLayout Margin="5" x:Name="EditLayout">
-            <Label x:Name="Message" VerticalTextAlignment="Center"/>
+            <Label x:Name="Message" VerticalTextAlignment="Center" />
             <HorizontalStackLayout Margin="5">
-                <Label Text="Id:" VerticalTextAlignment="Center"/>
-                <Entry x:Name="IdEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill"/>
+                <Label Text="Id:" VerticalTextAlignment="Center" />
+                <Entry x:Name="IdEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill" />
             </HorizontalStackLayout>
             <HorizontalStackLayout Margin="5">
-                <Label Text="Имя:" VerticalTextAlignment="Center"/>
-                <Entry x:Name="NameEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill"/>
+                <Label Text="Имя:" VerticalTextAlignment="Center" />
+                <Entry x:Name="NameEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill" />
             </HorizontalStackLayout>
             <HorizontalStackLayout Margin="5">
-                <Label Text="Описание:" VerticalTextAlignment="Center"/>
-                <Entry x:Name="DescEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill"/>
+                <Label Text="Описание:" VerticalTextAlignment="Center" />
+                <Entry x:Name="DescEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill" />
             </HorizontalStackLayout>
-            <Button Text="Добавить фото" Clicked="AddImageButtonClicked"  Margin="5,15,5,5"/>
-            <VerticalStackLayout Margin="5" x:Name="ImageLayout">
-                
-            </VerticalStackLayout>
-            <Button Text="Продолжить" Clicked="ProceedClicked"/>
+            <Button Text="Добавить фото" Clicked="AddImageButtonClicked" Margin="5,15,5,5" />
+            <VerticalStackLayout Margin="5" x:Name="ImageLayout" />
+            <Button Text="Продолжить" Clicked="ProceedClicked" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentView>

@@ -1,20 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using QRScanner.Services;
 
 namespace QRScanner.Views;
 
 public partial class ServerUrlInputView : ContentView
 {
-    public Action? OnProceed;
     private readonly AuthService _authService;
     private readonly UriHolderService _uriHolderService;
     public CancellationToken CancellationToken = CancellationToken.None;
+    public Action? OnProceed;
 
-    public ServerUrlInputView(AuthService authService,UriHolderService uriHolderService)
+    public ServerUrlInputView(AuthService authService, UriHolderService uriHolderService)
     {
         _authService = authService;
         _uriHolderService = uriHolderService;
@@ -29,6 +24,7 @@ public partial class ServerUrlInputView : ContentView
             await MainThread.InvokeOnMainThreadAsync(() => Message.Text = "Ссылка не валидна");
             return;
         }
+
         _uriHolderService.CurrentUri = result;
 
         await MainThread.InvokeOnMainThreadAsync(() => Proceed.IsEnabled = false);

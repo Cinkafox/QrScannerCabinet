@@ -3,10 +3,10 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="QRScanner.Views.ServerUrlInputView">
-    <VerticalStackLayout  Margin="5">
-        <Label Text="Ссылка на сервер:"/>
-        <Entry x:Name="Uri"/>
-        <Label x:Name="Message"/>
-        <Button x:Name="Proceed" Text="Продолжить" Clicked="ProceedClicked"/>
+    <VerticalStackLayout Margin="5">
+        <Label Text="Ссылка на сервер:" />
+        <Entry x:Name="Uri" />
+        <Label x:Name="Message" />
+        <Button x:Name="Proceed" Text="Продолжить" Clicked="ProceedClicked" />
     </VerticalStackLayout>
 </ContentView>

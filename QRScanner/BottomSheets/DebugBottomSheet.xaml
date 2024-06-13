@@ -7,11 +7,11 @@
     <the49:BottomSheet.Detents>
         <the49:FullscreenDetent />
     </the49:BottomSheet.Detents>
-    
+
     <ScrollView Orientation="Both">
         <VerticalStackLayout x:Name="Messages">
-           <Label Text="DEBUG MESSAGES:"/>
+            <Label Text="DEBUG MESSAGES:" />
         </VerticalStackLayout>
     </ScrollView>
-    
+
 </the49:BottomSheet>

@@ -1,35 +1,23 @@
 ﻿using QRScanner.BottomSheets;
 using QRScanner.Services;
 using QRScanner.Utils;
-using QRShared.Datum;
-using The49.Maui.BottomSheet;
 using ZXing.Net.Maui;
 using ContentPage = Microsoft.Maui.Controls.ContentPage;
 
 namespace QRScanner;
+
 public partial class MainPage : ContentPage
 {
-    public BottomSheetCollection BottomSheetCollection { get; }
-    public readonly List<ResultCabinet> History = [];
-    
-    private readonly DebugService Debug;
     private readonly CabinetInfoService _cabinetInfoService;
     private readonly IServiceProvider _serviceProvider;
 
-    private bool _isProcessing ;
+    private readonly DebugService Debug;
+    public readonly List<ResultCabinet> History = [];
     private bool _devEnabled;
-    
-    public bool DevEnabled
-    {
-        get => _devEnabled;
-        set
-        {
-            DevButton.IsVisible = value;
-            _devEnabled = value;
-        }
-    }
 
-    public MainPage(DebugService debug,CabinetInfoService cabinetInfoService,IServiceProvider serviceProvider)
+    private bool _isProcessing;
+
+    public MainPage(DebugService debug, CabinetInfoService cabinetInfoService, IServiceProvider serviceProvider)
     {
         InitializeComponent();
         CameraBarcodeReaderView.Options = new BarcodeReaderOptions
@@ -47,37 +35,46 @@ public partial class MainPage : ContentPage
         if (Dumper.TryReadDump(out var dumpReader))
         {
             Debug.Debug("____START READ DUMP____");
-            while (dumpReader.ReadLine() is { } line)
-            {
-                Debug.Debug(line);
-            }
-            
+            while (dumpReader.ReadLine() is { } line) Debug.Debug(line);
+
             dumpReader.Dispose();
             Debug.Debug("____END READ DUMP____");
         }
-        
+
         Debug.Debug("Application was started!");
+    }
+
+    public BottomSheetCollection BottomSheetCollection { get; }
+
+    public bool DevEnabled
+    {
+        get => _devEnabled;
+        set
+        {
+            DevButton.IsVisible = value;
+            _devEnabled = value;
+        }
     }
 
     private async void BarcodesDetected(object? sender, BarcodeDetectionEventArgs e)
     {
         var scanned = e.Results[0].Value;
         Debug.Debug("SCANNED: " + scanned);
-        
-        if(_isProcessing || BottomSheetCollection.IsSheetsShow ||
-           !Uri.TryCreate(scanned, UriKind.Absolute,out var uri))
+
+        if (_isProcessing || BottomSheetCollection.IsSheetsShow ||
+            !Uri.TryCreate(scanned, UriKind.Absolute, out var uri))
             return;
-        
+
         Debug.Debug("RESOLVING: " + scanned);
         SetProcessing(true);
-        
+
         var result = await _cabinetInfoService.Get(uri, CancellationToken.None);
         if (result is not null)
         {
             History.Add(result.Value);
             await BottomSheetCollection.ShowBottomSheet(new ResultBottomSheet(result.Value));
         }
-        
+
         SetProcessing(false);
     }
 
@@ -99,7 +96,7 @@ public partial class MainPage : ContentPage
     private async void MenuButtonClicked(object? sender, EventArgs e)
     {
         var menu = _serviceProvider.GetService<MenuBottomSheet>()!;
-        
+
         await BottomSheetCollection.ShowBottomSheet(menu);
     }
 }

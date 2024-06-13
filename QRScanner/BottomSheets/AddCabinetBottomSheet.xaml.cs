@@ -7,23 +7,24 @@ namespace QRScanner.BottomSheets;
 
 public partial class AddCabinetBottomSheet : BottomSheet, ICancellationBehaviour
 {
-    private readonly RestService _restService;
     private readonly AuthService _authService;
+    private readonly RestService _restService;
     private readonly IServiceProvider _serviceProvider;
-    public CancellationToken CancellationToken { get; set; }
-    
-    public AddCabinetBottomSheet(RestService restService,AuthService authService,IServiceProvider serviceProvider)
+
+    public AddCabinetBottomSheet(RestService restService, AuthService authService, IServiceProvider serviceProvider)
     {
         InitializeComponent();
         _restService = restService;
         _authService = authService;
         _serviceProvider = serviceProvider;
-        
+
         var urlInput = _serviceProvider.GetService<ServerUrlInputView>()!;
         urlInput.CancellationToken = CancellationToken;
         urlInput.OnProceed += OnUrlProceed;
         ViewContainer.Content = urlInput;
     }
+
+    public CancellationToken CancellationToken { get; set; }
 
     private void OnUrlProceed()
     {

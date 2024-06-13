@@ -30,10 +30,10 @@ public class DataBaseAuthProvider : IAuthDataProvider
     {
         var ba = _provider.Get<UserInformation>(new DbKeyValue(nameof(UserInformation.Login), login));
         if (ba.Count > 0) return false;
-        
-        _provider.Push(new UserInformation()
+
+        _provider.Push(new UserInformation
         {
-            Login = login,Password = password
+            Login = login, Password = password
         });
 
         return true;

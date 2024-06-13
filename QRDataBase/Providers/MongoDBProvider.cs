@@ -11,16 +11,16 @@ public class MongoDBProvider : IDataBaseProvider
 
     public void Connect(DataBaseOption option)
     {
-        _client = new MongoClient(new MongoClientSettings()
+        _client = new MongoClient(new MongoClientSettings
         {
             Server = new MongoServerAddress(option.Ip, option.Port),
-            Credential = MongoCredential.CreateCredential(option.DataBase,option.Login,option.Password)
+            Credential = MongoCredential.CreateCredential(option.DataBase, option.Login, option.Password)
         });
-        
+
         _database = _client.GetDatabase(option.DataBase);
     }
-    
-    public void Push<T>(T data,bool force = false)
+
+    public void Push<T>(T data, bool force = false)
     {
         _database.GetCollection<T>(typeof(T).Name).InsertOneAsync(data);
     }
@@ -42,18 +42,18 @@ public class MongoDBProvider : IDataBaseProvider
 
     public void Dispose()
     {
-        
     }
 
     private FilterDefinition<T> BuildFilter<T>(ISearchItem? searchItem)
     {
-        if(searchItem is null) 
+        if (searchItem is null)
             return FilterDefinition<T>.Empty;
-        
-        return BuildFilter(new FilterDefinitionBuilder<T>(),searchItem);
+
+        return BuildFilter(new FilterDefinitionBuilder<T>(), searchItem);
     }
 
-    private FilterDefinition<T> BuildFilter<T>(FilterDefinitionBuilder<T> filterDefinitionBuilder, ISearchItem searchItem)
+    private FilterDefinition<T> BuildFilter<T>(FilterDefinitionBuilder<T> filterDefinitionBuilder,
+        ISearchItem searchItem)
     {
         switch (searchItem)
         {
@@ -64,7 +64,7 @@ public class MongoDBProvider : IDataBaseProvider
                 var currAction = DbOperator.OR;
 
                 FilterDefinition<T>? tempDef = null;
-                
+
                 foreach (var item in search.Items)
                 {
                     if (item is IDbOperator opera)
@@ -72,7 +72,7 @@ public class MongoDBProvider : IDataBaseProvider
                         currAction = opera.Operator;
                         continue;
                     }
-                    
+
                     var currFilter = BuildFilter(filterDefinitionBuilder, item);
 
                     if (currAction == DbOperator.NOT)
@@ -82,7 +82,6 @@ public class MongoDBProvider : IDataBaseProvider
                     }
 
                     if (tempDef != null)
-                    {
                         switch (currAction)
                         {
                             case DbOperator.AND:
@@ -94,13 +93,10 @@ public class MongoDBProvider : IDataBaseProvider
                             default:
                                 throw new ArgumentOutOfRangeException();
                         }
-                    }
                     else
-                    {
                         tempDef = currFilter;
-                    }
-                    
                 }
+
                 return tempDef!;
             }
             default:

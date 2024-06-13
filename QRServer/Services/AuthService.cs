@@ -5,10 +5,10 @@ namespace QRServer.Services;
 
 public class AuthService
 {
-    private IAuthDataProvider _authDataProvider;
-    private ITokenProvider _tokenProvider;
+    private readonly IAuthDataProvider _authDataProvider;
+    private readonly ITokenProvider _tokenProvider;
 
-    public AuthService(IAuthDataProvider authDataProvider,ITokenProvider tokenProvider)
+    public AuthService(IAuthDataProvider authDataProvider, ITokenProvider tokenProvider)
     {
         _authDataProvider = authDataProvider;
         _tokenProvider = tokenProvider;
@@ -21,9 +21,9 @@ public class AuthService
             guid = Guid.Empty;
             return false;
         }
-        
+
         guid = _tokenProvider.Add(login);
-        
+
         return true;
     }
 
@@ -50,10 +50,7 @@ public class AuthService
 
     public bool TryGetUserByUid(Guid guid, out string login)
     {
-        if (_tokenProvider.TryGet(guid, out login))
-        {
-            return true;
-        }
+        if (_tokenProvider.TryGet(guid, out login)) return true;
 
         login = string.Empty;
         return false;
@@ -61,6 +58,6 @@ public class AuthService
 
     public bool TryGetUserByUid(string guid, out string login)
     {
-        return TryGetUserByUid(Guid.Parse(guid),out login);
+        return TryGetUserByUid(Guid.Parse(guid), out login);
     }
 }

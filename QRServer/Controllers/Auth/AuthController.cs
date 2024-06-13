@@ -9,7 +9,7 @@ namespace QRServer.Controllers.Auth;
 public class AuthController : ControllerBase
 {
     private readonly AuthService _authService;
-    
+
     public AuthController(AuthService authService)
     {
         _authService = authService;
@@ -20,16 +20,16 @@ public class AuthController : ControllerBase
     {
         if (_authService.TryAuth(userInformation.Login, userInformation.Password, out var guid))
             return Ok(guid);
-        
+
         return Unauthorized();
     }
-    
+
     [HttpPost("Register")]
     public IActionResult GenToken(UserInformation userInformation)
     {
         if (_authService.Register(userInformation.Login, userInformation.Password, out var guid))
             return Ok(guid);
-        
+
         return Unauthorized();
     }
 
@@ -37,8 +37,8 @@ public class AuthController : ControllerBase
     public IActionResult GetUser(string token)
     {
         if (_authService.TryGetUserByUid(token, out var login))
-            return Ok($"\"{login}\""); 
-        
+            return Ok($"\"{login}\"");
+
         return Unauthorized();
     }
 }

@@ -1,5 +1,3 @@
-using QRDataBase;
-using QRDataBase.Providers;
 using QRServer;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,4 +23,3 @@ app.MapControllers();
 
 Dependencies.ConnectDataBase(app);
 app.Run();
-

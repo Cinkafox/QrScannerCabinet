@@ -1,5 +1,4 @@
-﻿using QRScanner.Services;
-using QRScanner.Utils;
+﻿using QRScanner.Utils;
 
 namespace QRScanner;
 
@@ -9,7 +8,7 @@ public partial class App : Application
     {
         InitializeComponent();
         MainPage = serviceProvider.GetService<MainPage>();
-        
+
         AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
         {
             Dumper.Dump(args.ExceptionObject.ToString());

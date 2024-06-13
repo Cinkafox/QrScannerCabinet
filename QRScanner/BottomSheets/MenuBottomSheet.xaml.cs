@@ -9,15 +9,14 @@ public partial class MenuBottomSheet : BottomSheet, ICancellationBehaviour
 {
     private readonly MainPage _mainPage;
     private readonly IServiceProvider _serviceProvider;
-    public CancellationToken CancellationToken { get; set; }
 
     public MenuBottomSheet(MainPage mainPage, IServiceProvider serviceProvider)
     {
         InitializeComponent();
-        
+
         _mainPage = mainPage;
         _serviceProvider = serviceProvider;
-        
+
         foreach (var resultCabinet in mainPage.History)
         {
             var cabView = new SelectiveCabinetView();
@@ -29,13 +28,15 @@ public partial class MenuBottomSheet : BottomSheet, ICancellationBehaviour
 
         DevSwitch.IsToggled = mainPage.DevEnabled;
         DevSwitch.Toggled += DevSwitchOnToggled;
-        
+
         Dismissed += OnDismissed;
     }
 
+    public CancellationToken CancellationToken { get; set; }
+
     private async void ActionClicked(long obj, RoomInformation? roomInformation)
     {
-        await SwitchBottomSheet(new ResultBottomSheet(_mainPage.History.First(a => a.Information.Id==obj)));
+        await SwitchBottomSheet(new ResultBottomSheet(_mainPage.History.First(a => a.Information.Id == obj)));
     }
 
     private void DevSwitchOnToggled(object? sender, ToggledEventArgs e)

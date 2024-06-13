@@ -6,7 +6,7 @@ public class DbKeyValue : ISearchItem
 {
     public string Key;
     public object Value;
-    
+
     public DbKeyValue(string key, object value)
     {
         Key = key;

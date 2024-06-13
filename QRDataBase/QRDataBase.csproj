@@ -8,10 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="MongoDB.Driver" Version="2.21.0" />
-      <PackageReference Include="MySql.Data" Version="8.4.0" />
+        <PackageReference Include="MongoDB.Driver" Version="2.21.0"/>
+        <PackageReference Include="MySql.Data" Version="8.4.0"/>
     </ItemGroup>
 
-    <Import Project="..\QRShared\QRShared.projitems" Label="Shared" />
+    <Import Project="..\QRShared\QRShared.projitems" Label="Shared"/>
 
 </Project>

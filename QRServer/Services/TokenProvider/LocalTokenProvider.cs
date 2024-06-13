@@ -2,21 +2,21 @@
 
 public class LocalTokenProvider : ITokenProvider
 {
-    private readonly Dictionary<Guid, DateTime> _lifeList = new();
-    private readonly Dictionary<Guid, string> _keyList = new();
+    private static readonly TimeSpan TokenLifeTime = new(0, 0, 30, 0);
     private readonly Dictionary<string, Guid> _guidList = new();
-    private static readonly TimeSpan TokenLifeTime = new TimeSpan(0,0,30,0);
+    private readonly Dictionary<Guid, string> _keyList = new();
+    private readonly Dictionary<Guid, DateTime> _lifeList = new();
 
 
     public Guid Add(string key)
     {
-        if (_guidList.TryGetValue(key, out var guid)) 
+        if (_guidList.TryGetValue(key, out var guid))
             RemoveGuid(guid);
-        
+
         guid = Guid.NewGuid();
-        _lifeList.Add(guid,DateTime.Now + TokenLifeTime);
-        _keyList.Add(guid,key);
-        _guidList.Add(key,guid);
+        _lifeList.Add(guid, DateTime.Now + TokenLifeTime);
+        _keyList.Add(guid, key);
+        _guidList.Add(key, guid);
         return guid;
     }
 

@@ -5,7 +5,7 @@ namespace QRScanner.Utils;
 public static class Dumper
 {
     public static string DumpPath = Path.Combine(FileSystem.CacheDirectory, "crash.txt");
-    
+
     public static void Dump(string? message)
     {
         using var stream =
@@ -30,8 +30,8 @@ public static class Dumper
 
 public class DumpReader : IDisposable
 {
-    public readonly StreamReader StreamReader = new (new FileStream(Dumper.DumpPath, FileMode.OpenOrCreate));
-    
+    public readonly StreamReader StreamReader = new(new FileStream(Dumper.DumpPath, FileMode.OpenOrCreate));
+
     public void Dispose()
     {
         StreamReader.Dispose();

@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using QRScanner.BottomSheets;
 using QRScanner.Services;
 using QRShared.Datum;
@@ -12,15 +7,19 @@ namespace QRScanner.Views;
 
 public partial class CabinetEditView : ContentView
 {
-    private readonly IServiceProvider _serviceProvider;
     private readonly AuthService _authService;
     private readonly DebugService _debugService;
-    private readonly RestService _restService;
-    private readonly UriHolderService _uriHolderService;
     private readonly List<long> _imageRemovedId = new();
+    private readonly RestService _restService;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly UriHolderService _uriHolderService;
 
     public CancellationToken CancellationToken;
-    public CabinetEditView(IServiceProvider serviceProvider, AuthService authService, DebugService debugService, RestService restService,UriHolderService uriHolderService)
+
+    public Action<RoomInformation, List<ImageInfoCompound>, List<long>>? OnResult;
+
+    public CabinetEditView(IServiceProvider serviceProvider, AuthService authService, DebugService debugService,
+        RestService restService, UriHolderService uriHolderService)
     {
         InitializeComponent();
         _serviceProvider = serviceProvider;
@@ -30,21 +29,17 @@ public partial class CabinetEditView : ContentView
         _uriHolderService = uriHolderService;
     }
 
-    public Action<RoomInformation,List<ImageInfoCompound>,List<long>>? OnResult;
-
     public void LoadFromResult(ResultCabinet resultCabinet)
     {
         IdEntry.Text = resultCabinet.Information.Id.ToString();
         NameEntry.Text = resultCabinet.Information.Name;
         DescEntry.Text = resultCabinet.Information.Description;
 
-        foreach (var imageInformation in resultCabinet.ImageInformation)
-        {
-            AddImageInfo(imageInformation);
-        }
+        foreach (var imageInformation in resultCabinet.ImageInformation) AddImageInfo(imageInformation);
     }
-    
-    private void AddImageInfo(RoomImageInformation? imageInformation){
+
+    private void AddImageInfo(RoomImageInformation? imageInformation)
+    {
         var image = _serviceProvider.GetService<ImageCabinetView>()!;
         if (imageInformation is not null)
             image.LoadFromInformation(imageInformation);
@@ -57,10 +52,7 @@ public partial class CabinetEditView : ContentView
     private void ImageRemoveRequired(ImageCabinetView view)
     {
         ImageLayout.Remove(view);
-        if (view.ImageId is not null)
-        {
-            _imageRemovedId.Add(view.ImageId.Value);
-        }
+        if (view.ImageId is not null) _imageRemovedId.Add(view.ImageId.Value);
     }
 
     private async void ProceedClicked(object? sender, EventArgs e)
@@ -73,7 +65,7 @@ public partial class CabinetEditView : ContentView
 
         await MainThread.InvokeOnMainThreadAsync(() => EditLayout.IsEnabled = false);
 
-        var room = new RoomInformation()
+        var room = new RoomInformation
         {
             Id = id,
             Name = NameEntry.Text,
@@ -86,44 +78,43 @@ public partial class CabinetEditView : ContentView
             compound.ChangedInfo.RoomId = id;
             return compound;
         }).ToList();
-        
-        var result = await _restService.PostAsync<RawResult, RoomInformation>(room, 
+
+        var result = await _restService.PostAsync<RawResult, RoomInformation>(room,
             _uriHolderService.RoomPostUri,
-            CancellationToken,_authService.Token);
-        
+            CancellationToken, _authService.Token);
+
         if (result.StatusCode != HttpStatusCode.OK)
         {
-            _debugService.Error(result.StatusCode+" ROOM POST ERROR:"+result.Value?.Result);
+            _debugService.Error(result.StatusCode + " ROOM POST ERROR:" + result.Value?.Result);
             return;
         }
 
         foreach (var removedId in _imageRemovedId)
-        {
             await _restService.DeleteAsync<RawResult>(
                 new Uri(_uriHolderService.CurrentUri!, $"/RoomInformation/Images/{removedId}"), CancellationToken,
                 _authService.Token);
-        }
 
         foreach (var imageInfoCompound in compoundList)
         {
             var image = imageInfoCompound.Result;
-            _debugService.Debug("ADD " + imageInfoCompound.ForcePush + " " + image.RoomId + " " + image.URL + " " + image.Description);
-            if(imageInfoCompound.IsEqual) continue;
+            _debugService.Debug("ADD " + imageInfoCompound.ForcePush + " " + image.RoomId + " " + image.URL + " " +
+                                image.Description);
+            if (imageInfoCompound.IsEqual) continue;
 
             var overrideRequired = "?overrideValue=true";
             if (!imageInfoCompound.ForcePush) overrideRequired = "";
-            
+
             var resultImage = await _restService.PostAsync<RawResult, RoomImageInformation>(image,
-                new Uri(_uriHolderService.CurrentUri!, "/RoomInformation/Images" + overrideRequired), CancellationToken, _authService.Token);
-            
+                new Uri(_uriHolderService.CurrentUri!, "/RoomInformation/Images" + overrideRequired), CancellationToken,
+                _authService.Token);
+
             if (resultImage.StatusCode != HttpStatusCode.OK)
             {
-                _debugService.Error(resultImage.StatusCode+" IMAGE POST ERROR:"+result.Value?.Result);
-                continue;
+                _debugService.Error(resultImage.StatusCode + " IMAGE POST ERROR:" + result.Value?.Result);
             }
         }
-        
-        OnResult?.Invoke(room,compoundList,_imageRemovedId);
+
+        OnResult?.Invoke(room, compoundList, _imageRemovedId);
     }
 
     private void AddImageButtonClicked(object? sender, EventArgs e)
@@ -134,9 +125,8 @@ public partial class CabinetEditView : ContentView
 
 public class ImageInfoCompound
 {
-    public RoomImageInformation? OriginalInfo;
     public RoomImageInformation ChangedInfo;
-    public bool ForcePush => OriginalInfo != null;
+    public RoomImageInformation? OriginalInfo;
 
     public ImageInfoCompound(RoomImageInformation changedInfo, RoomImageInformation? originalInfo)
     {
@@ -144,10 +134,12 @@ public class ImageInfoCompound
         OriginalInfo = originalInfo;
     }
 
+    public bool ForcePush => OriginalInfo != null;
+
     public RoomImageInformation Result => new()
     {
-        Id = OriginalInfo?.Id ?? default, 
-        RoomId = ChangedInfo.RoomId, 
+        Id = OriginalInfo?.Id ?? default,
+        RoomId = ChangedInfo.RoomId,
         Description = ChangedInfo.Description,
         URL = ChangedInfo.URL
     };

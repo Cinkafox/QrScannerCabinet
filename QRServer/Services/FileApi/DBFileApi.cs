@@ -14,7 +14,7 @@ public class DBFileApi : IFileApi
     {
         _dataBaseProvider = dataBaseProvider;
     }
-    
+
     public Stream Open(string path)
     {
         path = path.Replace("\\", "-");
@@ -22,14 +22,14 @@ public class DBFileApi : IFileApi
         return Stream.Null;
     }
 
-    public bool TryOpen(string path,[NotNullWhen(true)] out Stream? stream)
+    public bool TryOpen(string path, [NotNullWhen(true)] out Stream? stream)
     {
         path = path.Replace("\\", "-");
-        var list = _dataBaseProvider.Get<FileDB>(new DbKeyValue(nameof(FileDB.Path),path));
+        var list = _dataBaseProvider.Get<FileDB>(new DbKeyValue(nameof(FileDB.Path), path));
         if (list.Count > 0)
         {
-           stream = new MemoryStream(list[0].Data);
-           return true;
+            stream = new MemoryStream(list[0].Data);
+            return true;
         }
 
         stream = null;
@@ -46,13 +46,12 @@ public class DBFileApi : IFileApi
             Data = StreamUtil.ReadFully(stream)
         });
     }
-    
 }
 
 public class FileDB
 {
-    [PrimaryKey]
-    public string Path { get; set; } = string.Empty;
+    [PrimaryKey] public string Path { get; set; } = string.Empty;
+
     public long Length { get; set; }
     public byte[] Data { get; set; } = [];
 }

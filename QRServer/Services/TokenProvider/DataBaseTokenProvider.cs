@@ -6,22 +6,21 @@ namespace QRServer.Services.TokenProvider;
 
 public class DataBaseTokenProvider : ITokenProvider
 {
-    
     private readonly IDataBaseProvider _provider;
 
     public DataBaseTokenProvider(IDataBaseProvider provider)
     {
         _provider = provider;
     }
-    
+
     public Guid Add(string key)
     {
         var guid = Guid.NewGuid();
-        _provider.Push(new TokenInformation()
+        _provider.Push(new TokenInformation
         {
             Key = key,
             Token = guid.ToString()
-        },true);
+        }, true);
         return guid;
     }
 

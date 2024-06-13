@@ -6,26 +6,23 @@ namespace QRTest.Server.Tokens;
 [TestFixture]
 public class TokenProviderTest
 {
-    private IDataBaseProvider _dataBaseProvider = default!;
-    
     [SetUp]
     public void Setup()
     {
         _dataBaseProvider = new LocalDBProvider();
     }
-    
+
+    private IDataBaseProvider _dataBaseProvider = default!;
+
     public void ProviderTestBase(ITokenProvider provider)
     {
-        for (var i = 0; i < 20; i++)
-        {
-            TestSingle(provider,"test"+i);
-        }
+        for (var i = 0; i < 20; i++) TestSingle(provider, "test" + i);
     }
 
-    public void TestSingle(ITokenProvider provider,string key)
+    public void TestSingle(ITokenProvider provider, string key)
     {
         var origGuid = provider.Add(key);
-        Assert.That(provider.TryGet(key,out var guid), Is.True);
+        Assert.That(provider.TryGet(key, out var guid), Is.True);
         Assert.That(guid, Is.EqualTo(origGuid));
     }
 

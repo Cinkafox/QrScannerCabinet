@@ -1,4 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
+
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
@@ -7,9 +8,9 @@
     <ScrollView>
         <Grid>
             <controls:CameraBarcodeReaderView
-              x:Name="CameraBarcodeReaderView"
-              BarcodesDetected="BarcodesDetected" IsTorchOn="True"/>
-            
+                x:Name="CameraBarcodeReaderView"
+                BarcodesDetected="BarcodesDetected" IsTorchOn="True" />
+
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0.15*" />
@@ -21,31 +22,31 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                
-                <Button 
-                    Clicked="MenuButtonClicked" 
-                    Text="|||" 
-                    BackgroundColor="Transparent" 
-                    HorizontalOptions="Start" 
-                    FontSize="25" 
-                    TextColor="WhiteSmoke"/>
-                <Button 
-                    Clicked="DebugButtonClicked" 
-                    Text="DEBUG" 
+
+                <Button
+                    Clicked="MenuButtonClicked"
+                    Text="|||"
+                    BackgroundColor="Transparent"
+                    HorizontalOptions="Start"
+                    FontSize="25"
+                    TextColor="WhiteSmoke" />
+                <Button
+                    Clicked="DebugButtonClicked"
+                    Text="DEBUG"
                     Height="2"
-                    Grid.Row="0" 
+                    Grid.Row="0"
                     Grid.Column="2"
-                    x:Name="DevButton" 
-                    IsVisible="False"/>
-                
-                <Image Grid.Row="1" 
-                       Grid.Column="1" 
-                       x:Name="ProcessingImage" 
-                       Source="loading.gif" 
-                       IsVisible="False" 
+                    x:Name="DevButton"
+                    IsVisible="False" />
+
+                <Image Grid.Row="1"
+                       Grid.Column="1"
+                       x:Name="ProcessingImage"
+                       Source="loading.gif"
+                       IsVisible="False"
                        HorizontalOptions="Center"
                        VerticalOptions="Center"
-                       IsAnimationPlaying="False"/>
+                       IsAnimationPlaying="False" />
             </Grid>
         </Grid>
     </ScrollView>

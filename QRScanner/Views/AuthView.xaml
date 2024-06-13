@@ -5,14 +5,14 @@
              x:Class="QRScanner.Views.AuthView">
     <VerticalStackLayout Margin="5" x:Name="AuthLayout" IsEnabled="False">
         <HorizontalStackLayout>
-            <Label Text="Логин:" VerticalTextAlignment="Center"/>
-            <Entry x:Name="LoginEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill"/>
+            <Label Text="Логин:" VerticalTextAlignment="Center" />
+            <Entry x:Name="LoginEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill" />
         </HorizontalStackLayout>
         <HorizontalStackLayout>
-            <Label Text="Пароль:" VerticalTextAlignment="Center"/>
-            <Entry x:Name="PasswordEntry" IsPassword="True" VerticalTextAlignment="Center" HorizontalOptions="Fill"/>
+            <Label Text="Пароль:" VerticalTextAlignment="Center" />
+            <Entry x:Name="PasswordEntry" IsPassword="True" VerticalTextAlignment="Center" HorizontalOptions="Fill" />
         </HorizontalStackLayout>
-        <Label x:Name="Message" VerticalTextAlignment="Center"/>
-        <Button Text="Авторизация" Clicked="AuthClicked"/>
+        <Label x:Name="Message" VerticalTextAlignment="Center" />
+        <Button Text="Авторизация" Clicked="AuthClicked" />
     </VerticalStackLayout>
 </ContentView>

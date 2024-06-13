@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using QRScanner.Services;
 
 namespace QRScanner.Views;
@@ -10,6 +5,11 @@ namespace QRScanner.Views;
 public partial class DebugMessageView : ContentView
 {
     private DebugMessage _message;
+
+    public DebugMessageView()
+    {
+        InitializeComponent();
+    }
 
     public DebugMessage Message
     {
@@ -34,10 +34,5 @@ public partial class DebugMessageView : ContentView
                     break;
             }
         }
-    }
-    
-    public DebugMessageView()
-    {
-        InitializeComponent();
     }
 }

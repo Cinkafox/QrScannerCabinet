@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
-    <HasSharedItems>true</HasSharedItems>
-    <SharedGUID>A7295B91-A359-448B-9034-A7239AB65A92</SharedGUID>
-  </PropertyGroup>
-  <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>QRShared</Import_RootNamespace>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)DataBase\Attributes\AutoIncrementAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataBase\Attributes\PrimaryKeyAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)DataBase\Attributes\ValueNotNullAttribute.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Datum\RoomImageInformation.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Datum\RoomInformation.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Datum\UserInformation.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Datum\TokenInformation.cs"/>
-  </ItemGroup>
+    <PropertyGroup>
+        <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+        <HasSharedItems>true</HasSharedItems>
+        <SharedGUID>A7295B91-A359-448B-9034-A7239AB65A92</SharedGUID>
+    </PropertyGroup>
+    <PropertyGroup Label="Configuration">
+        <Import_RootNamespace>QRShared</Import_RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+        <Compile Include="$(MSBuildThisFileDirectory)DataBase\Attributes\AutoIncrementAttribute.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)DataBase\Attributes\PrimaryKeyAttribute.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)DataBase\Attributes\ValueNotNullAttribute.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Datum\RoomImageInformation.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Datum\RoomInformation.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Datum\UserInformation.cs"/>
+        <Compile Include="$(MSBuildThisFileDirectory)Datum\TokenInformation.cs"/>
+    </ItemGroup>
 </Project>

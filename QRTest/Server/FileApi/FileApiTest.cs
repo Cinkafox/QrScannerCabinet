@@ -6,22 +6,21 @@ namespace QRTest.Server.FileApi;
 [TestFixture]
 public class FileApiTest
 {
-
     [Test]
     public void TestDB()
     {
         var fileApi = new DBFileApi(new LocalDBProvider());
         Test(fileApi);
     }
-    
+
     [Test]
     public void TestTemp()
     {
         var fileApi = new TempFileApi();
         Test(fileApi);
     }
-    
-    
+
+
     public void Test(IFileApi fileApi)
     {
         var data = "bla-bla"u8.ToArray();
@@ -32,6 +31,6 @@ public class FileApiTest
         Assert.IsNotNull(fileStream);
         var fileBuff = new byte[data.Length];
         fileStream.Read(fileBuff, 0, data.Length);
-        Assert.That(fileBuff,Is.EqualTo(data));
+        Assert.That(fileBuff, Is.EqualTo(data));
     }
 }

@@ -12,9 +12,9 @@ public static class Dependencies
     public static void Register(WebApplicationBuilder builder)
     {
         builder.Services.AddSingleton<ITokenProvider, LocalTokenProvider>();
-        builder.Services.AddSingleton<IDataBaseProvider,MySqlDBProvider>();
+        builder.Services.AddSingleton<IDataBaseProvider, MySqlDBProvider>();
         builder.Services.AddSingleton<IFileApi, DBFileApi>();
-        builder.Services.AddSingleton<IAuthDataProvider,DataBaseAuthProvider>();
+        builder.Services.AddSingleton<IAuthDataProvider, DataBaseAuthProvider>();
         builder.Services.AddSingleton<AuthService>();
     }
 
