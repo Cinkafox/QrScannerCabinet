@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using QRScanner.BottomSheets;
 using QRScanner.Services;
 using QRShared.Datum;
 
@@ -17,13 +10,14 @@ public partial class CabinetActionView : ContentView
     private readonly CabinetInfoService _cabinetInfoService;
     private readonly IServiceProvider _serviceProvider;
     private readonly DebugService _debugService;
+    private readonly UriHolderService _uriHolderService;
     private readonly Uri _uri;
     
     public CancellationToken CancellationToken = CancellationToken.None;
 
     public CabinetActionView(RestService restService,AuthService authService, 
         CabinetInfoService cabinetInfoService,IServiceProvider serviceProvider,
-        DebugService debugService)
+        DebugService debugService,UriHolderService uriHolderService)
     {
         InitializeComponent();
         _restService = restService;
@@ -31,8 +25,8 @@ public partial class CabinetActionView : ContentView
         _cabinetInfoService = cabinetInfoService;
         _serviceProvider = serviceProvider;
         _debugService = debugService;
-        _uri = _authService.CurrentUri!;
-        _cabinetInfoService.CurrentUri = _uri;
+        _uriHolderService = uriHolderService;
+        _uri = uriHolderService.CurrentUri!;
 
         MainThread.InvokeOnMainThreadAsync(LoadCabinetInfo);
     }
@@ -47,7 +41,7 @@ public partial class CabinetActionView : ContentView
         if(!await EnsureAuth())
             return;
         
-        var roomList = await _restService.GetAsync<List<RoomInformation>>(new Uri(_uri,"/RoomInformation/List"), CancellationToken);
+        var roomList = await _restService.GetAsync<List<RoomInformation>>(_uriHolderService.RoomListUri, CancellationToken);
         
         CabinetStack.Children.Clear();
         
@@ -87,55 +81,24 @@ public partial class CabinetActionView : ContentView
             if (cabinetInfo != null) cabinetEdit.LoadFromResult(cabinetInfo.Value);
         }
         cabinetEdit.OnResult += OnResult;
+        cabinetEdit.CancellationToken = CancellationToken;
         
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
             AdditionView.Content = cabinetEdit;
+            AdditionView.IsVisible = true;
             MainLayout.IsVisible = false;
         });
     }
 
-    private async void OnResult(RoomInformation roomInformation, List<ImageInfoCompound> list)
+    private async void OnResult(RoomInformation roomInformation, List<ImageInfoCompound> list,List<long> removedList)
     {
-        if(!await EnsureAuth())
-            return;
-        
-        _debugService.Debug("START SOME PUSH");
-
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
             AdditionView.Content = null;
+            AdditionView.IsVisible = false;
             MainLayout.IsVisible = true;
         });
-        
-        var result = await _restService.PostAsync<RawResult, RoomInformation>(roomInformation, 
-            new Uri(_authService.CurrentUri!, $"/RoomInformation?overrideValue=true"),
-            CancellationToken,_authService.Token);
-        
-        if (result.StatusCode != HttpStatusCode.OK)
-        {
-            _debugService.Error(result.StatusCode+" ROOM POST ERROR:"+result.Value?.Result);
-            return;
-        }
-
-        foreach (var imageInfoCompound in list)
-        {
-            if(imageInfoCompound.IsEqual) continue;
-
-            var overrideRequired = "?overrideValue=true";
-            if (!imageInfoCompound.ForcePush) overrideRequired = "";
-
-            var image = imageInfoCompound.Result;
-            
-            var resultImage = await _restService.PostAsync<RawResult, RoomImageInformation>(image,
-                new Uri(_authService.CurrentUri!, "/RoomInformation/Images" + overrideRequired), CancellationToken, _authService.Token);
-            
-            if (resultImage.StatusCode != HttpStatusCode.OK)
-            {
-                _debugService.Error(resultImage.StatusCode+" IMAGE POST ERROR:"+result.Value?.Result);
-                continue;
-            }
-        }
         
         await LoadCabinetInfo();
     }

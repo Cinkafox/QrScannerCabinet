@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using QRScanner.BottomSheets;
@@ -11,12 +12,25 @@ namespace QRScanner.Views;
 
 public partial class CabinetEditView : ContentView
 {
-    public CabinetEditView()
+    private readonly IServiceProvider _serviceProvider;
+    private readonly AuthService _authService;
+    private readonly DebugService _debugService;
+    private readonly RestService _restService;
+    private readonly UriHolderService _uriHolderService;
+    private readonly List<long> _imageRemovedId = new();
+
+    public CancellationToken CancellationToken;
+    public CabinetEditView(IServiceProvider serviceProvider, AuthService authService, DebugService debugService, RestService restService,UriHolderService uriHolderService)
     {
         InitializeComponent();
+        _serviceProvider = serviceProvider;
+        _authService = authService;
+        _debugService = debugService;
+        _restService = restService;
+        _uriHolderService = uriHolderService;
     }
 
-    public Action<RoomInformation,List<ImageInfoCompound>>? OnResult;
+    public Action<RoomInformation,List<ImageInfoCompound>,List<long>>? OnResult;
 
     public void LoadFromResult(ResultCabinet resultCabinet)
     {
@@ -31,26 +45,33 @@ public partial class CabinetEditView : ContentView
     }
     
     private void AddImageInfo(RoomImageInformation? imageInformation){
-        var image = new ImageCabinetView();
+        var image = _serviceProvider.GetService<ImageCabinetView>()!;
         if (imageInformation is not null)
             image.LoadFromInformation(imageInformation);
-        
+
+        image.CancellationToken = CancellationToken;
         image.RemoveRequired += ImageRemoveRequired;
         ImageLayout.Add(image);
     }
 
-    private void ImageRemoveRequired(ImageInfoCompound compound,ImageCabinetView view)
+    private void ImageRemoveRequired(ImageCabinetView view)
     {
         ImageLayout.Remove(view);
+        if (view.ImageId is not null)
+        {
+            _imageRemovedId.Add(view.ImageId.Value);
+        }
     }
 
-    private void ProceedClicked(object? sender, EventArgs e)
+    private async void ProceedClicked(object? sender, EventArgs e)
     {
         if (!long.TryParse(IdEntry.Text, out var id) || id < 0)
         {
             Message.Text = "Invalid id";
             return;
         }
+
+        await MainThread.InvokeOnMainThreadAsync(() => EditLayout.IsEnabled = false);
 
         var room = new RoomInformation()
         {
@@ -61,11 +82,48 @@ public partial class CabinetEditView : ContentView
 
         var compoundList = ImageLayout.Children.Cast<ImageCabinetView>().Select(c =>
         {
-            c.Compound.ChangedInfo.RoomId = id;
-            return c.Compound;
+            var compound = c.Compound;
+            compound.ChangedInfo.RoomId = id;
+            return compound;
         }).ToList();
         
-        OnResult?.Invoke(room,compoundList);
+        var result = await _restService.PostAsync<RawResult, RoomInformation>(room, 
+            _uriHolderService.RoomPostUri,
+            CancellationToken,_authService.Token);
+        
+        if (result.StatusCode != HttpStatusCode.OK)
+        {
+            _debugService.Error(result.StatusCode+" ROOM POST ERROR:"+result.Value?.Result);
+            return;
+        }
+
+        foreach (var removedId in _imageRemovedId)
+        {
+            await _restService.DeleteAsync<RawResult>(
+                new Uri(_uriHolderService.CurrentUri!, $"/RoomInformation/Images/{removedId}"), CancellationToken,
+                _authService.Token);
+        }
+
+        foreach (var imageInfoCompound in compoundList)
+        {
+            var image = imageInfoCompound.Result;
+            _debugService.Debug("ADD " + imageInfoCompound.ForcePush + " " + image.RoomId + " " + image.URL + " " + image.Description);
+            if(imageInfoCompound.IsEqual) continue;
+
+            var overrideRequired = "?overrideValue=true";
+            if (!imageInfoCompound.ForcePush) overrideRequired = "";
+            
+            var resultImage = await _restService.PostAsync<RawResult, RoomImageInformation>(image,
+                new Uri(_uriHolderService.CurrentUri!, "/RoomInformation/Images" + overrideRequired), CancellationToken, _authService.Token);
+            
+            if (resultImage.StatusCode != HttpStatusCode.OK)
+            {
+                _debugService.Error(resultImage.StatusCode+" IMAGE POST ERROR:"+result.Value?.Result);
+                continue;
+            }
+        }
+        
+        OnResult?.Invoke(room,compoundList,_imageRemovedId);
     }
 
     private void AddImageButtonClicked(object? sender, EventArgs e)
@@ -86,7 +144,7 @@ public class ImageInfoCompound
         OriginalInfo = originalInfo;
     }
 
-    public RoomImageInformation Result => new RoomImageInformation()
+    public RoomImageInformation Result => new()
     {
         Id = OriginalInfo?.Id ?? default, 
         RoomId = ChangedInfo.RoomId, 

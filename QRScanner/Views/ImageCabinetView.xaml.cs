@@ -3,45 +3,66 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using QRScanner.Services;
 using QRShared.Datum;
 
 namespace QRScanner.Views;
 
 public partial class ImageCabinetView : ContentView
 {
+    private readonly RestService _restService;
+    private readonly AuthService _authService;
+    private readonly UriHolderService _uriHolderService;
+    private RoomImageInformation? _originalInfo;
 
-    public readonly ImageInfoCompound Compound = new ImageInfoCompound(new RoomImageInformation(), null);
-    
-    public Action<ImageInfoCompound,ImageCabinetView>? RemoveRequired;
-    public ImageCabinetView()
+    public long? ImageId { get; private set; }
+    public CancellationToken CancellationToken;
+    public ImageInfoCompound Compound =>
+        new(new RoomImageInformation()
+        {
+            URL = UriEntry.Text,
+            Description = DescEntry.Text
+        }, _originalInfo);
+
+    public Action<ImageCabinetView>? RemoveRequired;
+    public ImageCabinetView(RestService restService, AuthService authService,UriHolderService uriHolderService)
     {
         InitializeComponent();
+        
+        _restService = restService;
+        _authService = authService;
+        _uriHolderService = uriHolderService;
     }
 
     public void LoadFromInformation(RoomImageInformation roomImageInformation)
     {
-        Compound.OriginalInfo = roomImageInformation;
-        CabinetImage.Source = new UriImageSource()
-        {
-            Uri = new Uri(roomImageInformation.URL)
-        };
+        ImageId = roomImageInformation.Id;
+        _originalInfo = roomImageInformation;
         UriEntry.Text = roomImageInformation.URL;
         DescEntry.Text = roomImageInformation.Description;
     }
 
     private void DeleteClicked(object? sender, EventArgs e)
     {
-        RemoveRequired?.Invoke(Compound,this);
+        RemoveRequired?.Invoke(this);
     }
 
-    private void OnUnfocused(object? sender, FocusEventArgs e)
+    private async void UploadButtonClicked(object? sender, EventArgs e)
     {
-        if (!Uri.TryCreate(UriEntry.Text,UriKind.Absolute, out var uri))
+        MainThread.BeginInvokeOnMainThread(()=>UploadButton.IsEnabled = false);
+        var result = await FilePicker.Default.PickAsync(new PickOptions()
         {
-            return;
+            FileTypes = FilePickerFileType.Images, PickerTitle = "Выберите фото для загрузки"
+        });
+        if (result != null)
+        {
+            await using var stream = await result.OpenReadAsync();
+            var postResult = await _restService.PostAsync<string>(stream, _uriHolderService.ImagePostUri,
+                    CancellationToken, _authService.Token);
+            if (postResult.Value is not null)
+                UriEntry.Text = postResult.Value;
         }
         
-        Compound.ChangedInfo.URL = uri.ToString();
-        Compound.ChangedInfo.Description = DescEntry.Text;
+        MainThread.BeginInvokeOnMainThread(()=>UploadButton.IsEnabled = true);
     }
 }

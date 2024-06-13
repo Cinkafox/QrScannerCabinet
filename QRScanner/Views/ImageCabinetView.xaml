@@ -4,9 +4,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="QRScanner.Views.ImageCabinetView">
     <VerticalStackLayout Margin="5">
-        <Image x:Name="CabinetImage" Margin="5" Unfocused="OnUnfocused"/>
-        <Entry x:Name="UriEntry" Margin="5" Unfocused="OnUnfocused"/>
-        <Entry x:Name="DescEntry" Margin="5" Unfocused="OnUnfocused"/>
-        <Button Text="Удалить" Clicked="DeleteClicked"/>
+        <Image x:Name="CabinetImage" Margin="5"/>
+        <Label Text="Ссылка на изображение:" Margin="5,15,5,5"/>
+        <Entry x:Name="UriEntry" Margin="5"/>
+        <Button Text="Загрузить изображение" Clicked="UploadButtonClicked" Margin="5" x:Name="UploadButton"/>
+        <Label Text="Описание:" Margin="5,15,5,5"/>
+        <Entry x:Name="DescEntry" Margin="5"/>
+        <Button Text="Удалить" Clicked="DeleteClicked" Margin="5,15,5,5"/>
     </VerticalStackLayout>
 </ContentView>

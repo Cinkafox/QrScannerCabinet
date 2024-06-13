@@ -97,7 +97,7 @@ public class RoomInformationController : ControllerBase
         }
         
         _provider.Remove<RoomImageInformation>(
-            new DbKeyValue(nameof(RoomImageInformation.RoomId),id)
+            new DbKeyValue(nameof(RoomImageInformation.Id),id)
         );
         return true;
     }

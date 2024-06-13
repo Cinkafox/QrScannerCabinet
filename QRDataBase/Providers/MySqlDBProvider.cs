@@ -1,5 +1,6 @@
 using System.Data;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using QRDataBase.Filter;
 using QRShared.DataBase.Attributes;
@@ -22,9 +23,20 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
         _mySqlConnection.Open();
     }
     
+    private void strObj(object? data)
+    {
+        if(data == null) return;
+        foreach (var prop in data.GetType().GetProperties())
+        {
+            Console.WriteLine(prop.Name + " = " + prop.GetValue(data));
+        }
+    }
+    
     public void Push<T>(T information,bool force = false)
     {
         CreateTableIfNotExist<T>();
+        Console.WriteLine("PUSHING " + force);
+        strObj(information);
         
         if (Has<T>(GetKeyProperty(information)))
         {
@@ -40,6 +52,8 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
     {
         CreateTableIfNotExist<T>();
         var objList = new List<T>();
+        
+        Console.WriteLine("GETTING " + search);
         
         using var command = _mySqlConnection.CreateCommand();
         command.CommandText = "SELECT * FROM " + typeof(T).Name;
@@ -115,10 +129,8 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
         
         foreach (var property in typeof(T).GetProperties())
         {
-            if (property.GetCustomAttribute<AutoIncrementAttribute>() is not null)
-            {
+            if (property.GetCustomAttribute<AutoIncrementAttribute>() is not null && !force)
                 continue;   
-            }
 
             var propValue = property.GetValue(value);
             if (propValue is null)

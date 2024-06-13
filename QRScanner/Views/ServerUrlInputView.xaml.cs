@@ -11,13 +11,15 @@ public partial class ServerUrlInputView : ContentView
 {
     public Action? OnProceed;
     private readonly AuthService _authService;
+    private readonly UriHolderService _uriHolderService;
     public CancellationToken CancellationToken = CancellationToken.None;
 
-    public ServerUrlInputView(AuthService authService)
+    public ServerUrlInputView(AuthService authService,UriHolderService uriHolderService)
     {
         _authService = authService;
+        _uriHolderService = uriHolderService;
         InitializeComponent();
-        Uri.Text = _authService.CurrentUri?.ToString() ?? "";
+        Uri.Text = _uriHolderService.CurrentUri?.ToString() ?? "";
     }
 
     private async void ProceedClicked(object? sender, EventArgs e)
@@ -27,7 +29,7 @@ public partial class ServerUrlInputView : ContentView
             await MainThread.InvokeOnMainThreadAsync(() => Message.Text = "Ссылка не валидна");
             return;
         }
-        _authService.CurrentUri = result;
+        _uriHolderService.CurrentUri = result;
 
         await MainThread.InvokeOnMainThreadAsync(() => Proceed.IsEnabled = false);
         await _authService.CheckAuth(CancellationToken);

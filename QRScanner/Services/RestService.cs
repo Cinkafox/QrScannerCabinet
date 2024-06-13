@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using QRScanner.Utils;
@@ -26,6 +28,7 @@ public class RestService
         if (token is not null)
             uri = uri.AddParameter(nameof(token), token.Value.ToString());
         
+        _debug.Debug("GET " + uri);
         try
         {
             var response = await _client.GetAsync(uri,cancellationToken);
@@ -49,6 +52,7 @@ public class RestService
         if (token is not null)
             uri = uri.AddParameter(nameof(token), token.Value.ToString());
         
+        _debug.Debug("POST " + uri);
         try
         {
             var json = JsonSerializer.Serialize<T>(information, _serializerOptions);
@@ -68,10 +72,31 @@ public class RestService
         if (token is not null)
             uri = uri.AddParameter(nameof(token), token.Value.ToString());
 
+        _debug.Debug("POST " + uri);
         try
         {
-            var content = new StreamContent(stream);
-            var response = await _client.PostAsync(uri, content,cancellationToken);
+            using var multipartFormContent = new MultipartFormDataContent("Upload----" + DateTime.Now.ToString(CultureInfo.InvariantCulture));
+            multipartFormContent.Add(new StreamContent(stream), name: "formFile", fileName: "image.png");
+            var response = await _client.PostAsync(uri, multipartFormContent,cancellationToken);
+            return await ReadResult<T>(response,cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _debug.Error("ERROR " + ex.Message);
+            if(ex.StackTrace != null) _debug.Error(ex.StackTrace);
+            return new RestResult<T>(default, ex.Message,HttpStatusCode.RequestTimeout);
+        }
+    }
+
+    public async Task<RestResult<T>> DeleteAsync<T>(Uri uri,CancellationToken cancellationToken, Guid? token = null)
+    {
+        if (token is not null)
+            uri = uri.AddParameter(nameof(token), token.Value.ToString());
+        
+        _debug.Debug("DELETE " + uri);
+        try
+        {
+            var response = await _client.DeleteAsync(uri,cancellationToken);
             return await ReadResult<T>(response,cancellationToken);
         }
         catch (Exception ex)
@@ -83,9 +108,11 @@ public class RestService
     
     private async Task<RestResult<T>> ReadResult<T>(HttpResponseMessage response,CancellationToken cancellationToken)
     {
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+        _debug.Debug("CONTENT:"+content);
+        
         if (response.IsSuccessStatusCode)
         {
-            var content = await response.Content.ReadAsStringAsync(cancellationToken);
             _debug.Debug($"SUCCESSFUL GET CONTENT {typeof(T)} {content}");
             if (typeof(T) == typeof(RawResult))
                 return (new RestResult<RawResult>(new RawResult(content),null,response.StatusCode) as RestResult<T>)!;
@@ -93,7 +120,7 @@ public class RestService
             return new RestResult<T>(JsonSerializer.Deserialize<T>(content, _serializerOptions),null,response.StatusCode);
         }
 
-        _debug.Error("ERROR " + response.StatusCode);
+        _debug.Error("ERROR " + response.StatusCode + " " + content);
         return new RestResult<T>(default, "response code:" + response.StatusCode,response.StatusCode);
     }
 }

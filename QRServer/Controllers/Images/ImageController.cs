@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using QRServer.Services;
 using QRServer.Services.FileApi;
@@ -22,7 +23,7 @@ public class ImageController : ControllerBase
     public IActionResult Get(string path)
     {
         if (!Guid.TryParse(path, out _)) 
-            return NotFound();
+            return new StatusCodeResult(403);;
         
         if (_fileApi.TryOpen(Path.Join(_imagePath,path), out var stream))
         {
@@ -37,9 +38,8 @@ public class ImageController : ControllerBase
     {
         if (!_authService.HasAuthed(token))
             return Unauthorized();
-        
-        if (formFile.ContentType != "image/png") 
-            return NoContent();
+     
+        Console.WriteLine("POST SOME IMAGE ");
 
         var fileName = Guid.NewGuid().ToString();
         

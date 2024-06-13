@@ -4,7 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="QRScanner.Views.CabinetEditView">
     <ScrollView>
-        <VerticalStackLayout Margin="5">
+        <VerticalStackLayout Margin="5" x:Name="EditLayout">
             <Label x:Name="Message" VerticalTextAlignment="Center"/>
             <HorizontalStackLayout Margin="5">
                 <Label Text="Id:" VerticalTextAlignment="Center"/>

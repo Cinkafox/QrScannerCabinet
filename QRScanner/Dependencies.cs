@@ -12,6 +12,7 @@ public static class Dependencies
         builder.Services.AddSingleton<AuthService>();
         builder.Services.AddSingleton<DebugService>();
         builder.Services.AddSingleton<CabinetInfoService>();
+        builder.Services.AddSingleton<UriHolderService>();
     }
 
     public static void RegisterViews(MauiAppBuilder builder)
@@ -24,5 +25,6 @@ public static class Dependencies
         builder.Services.AddTransient<CabinetActionView>();
         builder.Services.AddTransient<AuthView>();
         builder.Services.AddTransient<CabinetEditView>();
+        builder.Services.AddTransient<ImageCabinetView>();
     }
 }
