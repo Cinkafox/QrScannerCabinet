@@ -23,5 +23,6 @@ public static class Dependencies
         builder.Services.AddTransient<ServerUrlInputView>();
         builder.Services.AddTransient<CabinetActionView>();
         builder.Services.AddTransient<AuthView>();
+        builder.Services.AddTransient<CabinetEditView>();
     }
 }

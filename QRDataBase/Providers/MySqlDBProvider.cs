@@ -25,16 +25,14 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
     public void Push<T>(T information,bool force = false)
     {
         CreateTableIfNotExist<T>();
-
-        using var command = _mySqlConnection.CreateCommand();
-        var insertCommand = "INSERT INTO";
+        
         if (Has<T>(GetKeyProperty(information)))
         {
             if(!force) return;
-            insertCommand = "REPLACE INTO";
         }
         
-        CreateInsertCommand(information, command, insertCommand);
+        using var command = _mySqlConnection.CreateCommand();
+        CreateInsertCommand(information, command, force);
         command.ExecuteNonQuery();
     }
 
@@ -109,9 +107,11 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
         return instance;
     }
 
-    private void CreateInsertCommand<T>(T value, MySqlCommand command,string insertCommand = "INSERT INTO")
+    private void CreateInsertCommand<T>(T value, MySqlCommand command,bool force = false)
     {
         var propertyList = new List<string>();
+        var insertCommand = "INSERT INTO";
+        if(force) insertCommand = "REPLACE INTO";
         
         foreach (var property in typeof(T).GetProperties())
         {

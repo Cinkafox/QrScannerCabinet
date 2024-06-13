@@ -8,9 +8,7 @@
             <Label x:Name="Message"/>
             <Button Text="Добавить комнату" Clicked="AddButtonClicked"/>
             <ScrollView Margin="0,15,0,0">
-                <VerticalStackLayout x:Name="CabinetStack">
-                    <Label Text="Загрузка..."/>
-                </VerticalStackLayout>
+                <VerticalStackLayout x:Name="CabinetStack"/>
             </ScrollView>
         </VerticalStackLayout>
         <ScrollView x:Name="AdditionView"/>

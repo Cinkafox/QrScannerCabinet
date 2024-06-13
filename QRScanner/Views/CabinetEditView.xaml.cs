@@ -16,9 +16,7 @@ public partial class CabinetEditView : ContentView
         InitializeComponent();
     }
 
-    public Action<ResultCabinet>? OnResult;
-
-    public Dictionary<long, RoomImageInformation> ImageList = [];
+    public Action<RoomInformation,List<ImageInfoCompound>>? OnResult;
 
     public void LoadFromResult(ResultCabinet resultCabinet)
     {
@@ -28,24 +26,22 @@ public partial class CabinetEditView : ContentView
 
         foreach (var imageInformation in resultCabinet.ImageInformation)
         {
-            var image = new ImageCabinetView();
-            image.LoadFromInformation(imageInformation);
-            image.RemoveRequired += ImageRemoveRequired;
-            image.InformationChange += InformationChange;
-            ImageLayout.Add(image);
-            ImageList[imageInformation.Id] = imageInformation;
+            AddImageInfo(imageInformation);
         }
     }
-
-    private void InformationChange(long id, RoomImageInformation info)
-    {
-        ImageList[id] = info;
+    
+    private void AddImageInfo(RoomImageInformation? imageInformation){
+        var image = new ImageCabinetView();
+        if (imageInformation is not null)
+            image.LoadFromInformation(imageInformation);
+        
+        image.RemoveRequired += ImageRemoveRequired;
+        ImageLayout.Add(image);
     }
 
-    private void ImageRemoveRequired(long id,ImageCabinetView view)
+    private void ImageRemoveRequired(ImageInfoCompound compound,ImageCabinetView view)
     {
         ImageLayout.Remove(view);
-        ImageList.Remove(id);
     }
 
     private void ProceedClicked(object? sender, EventArgs e)
@@ -63,13 +59,47 @@ public partial class CabinetEditView : ContentView
             Description = DescEntry.Text
         };
 
-        var imageList = ImageList.Values.ToList();
+        var compoundList = ImageLayout.Children.Cast<ImageCabinetView>().Select(c =>
+        {
+            c.Compound.ChangedInfo.RoomId = id;
+            return c.Compound;
+        }).ToList();
         
-        OnResult?.Invoke(new ResultCabinet(room,imageList));
+        OnResult?.Invoke(room,compoundList);
     }
 
     private void AddImageButtonClicked(object? sender, EventArgs e)
     {
-        
+        AddImageInfo(null);
+    }
+}
+
+public class ImageInfoCompound
+{
+    public RoomImageInformation? OriginalInfo;
+    public RoomImageInformation ChangedInfo;
+    public bool ForcePush => OriginalInfo != null;
+
+    public ImageInfoCompound(RoomImageInformation changedInfo, RoomImageInformation? originalInfo)
+    {
+        ChangedInfo = changedInfo;
+        OriginalInfo = originalInfo;
+    }
+
+    public RoomImageInformation Result => new RoomImageInformation()
+    {
+        Id = OriginalInfo?.Id ?? default, 
+        RoomId = ChangedInfo.RoomId, 
+        Description = ChangedInfo.Description,
+        URL = ChangedInfo.URL
+    };
+
+    public bool IsEqual
+    {
+        get
+        {
+            if (OriginalInfo is null) return false;
+            return OriginalInfo.URL == ChangedInfo.URL && OriginalInfo.Description == ChangedInfo.Description;
+        }
     }
 }

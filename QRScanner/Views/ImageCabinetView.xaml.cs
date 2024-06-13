@@ -10,13 +10,9 @@ namespace QRScanner.Views;
 public partial class ImageCabinetView : ContentView
 {
 
-    private RoomImageInformation _roomImageInformation = new();
+    public readonly ImageInfoCompound Compound = new ImageInfoCompound(new RoomImageInformation(), null);
     
-    public Action<long, RoomImageInformation>? InformationChange;
-    
-    public Action<long,ImageCabinetView>? RemoveRequired;
-    public long RoomId { get; private set; }
-    public long Id { get; private set; }
+    public Action<ImageInfoCompound,ImageCabinetView>? RemoveRequired;
     public ImageCabinetView()
     {
         InitializeComponent();
@@ -24,20 +20,18 @@ public partial class ImageCabinetView : ContentView
 
     public void LoadFromInformation(RoomImageInformation roomImageInformation)
     {
+        Compound.OriginalInfo = roomImageInformation;
         CabinetImage.Source = new UriImageSource()
         {
             Uri = new Uri(roomImageInformation.URL)
         };
         UriEntry.Text = roomImageInformation.URL;
         DescEntry.Text = roomImageInformation.Description;
-        RoomId = roomImageInformation.RoomId;
-        Id = roomImageInformation.Id;
-        _roomImageInformation = roomImageInformation;
     }
 
     private void DeleteClicked(object? sender, EventArgs e)
     {
-        RemoveRequired?.Invoke(Id,this);
+        RemoveRequired?.Invoke(Compound,this);
     }
 
     private void OnUnfocused(object? sender, FocusEventArgs e)
@@ -47,8 +41,7 @@ public partial class ImageCabinetView : ContentView
             return;
         }
         
-        _roomImageInformation.URL = uri.ToString();
-        _roomImageInformation.Description = DescEntry.Text;
-        InformationChange?.Invoke(Id,_roomImageInformation);
+        Compound.ChangedInfo.URL = uri.ToString();
+        Compound.ChangedInfo.Description = DescEntry.Text;
     }
 }
