@@ -5,15 +5,14 @@ namespace QRScanner;
 
 public partial class App : Application
 {
-    public App(RestService service,DebugService debug,AuthService auth)
+    public App(IServiceProvider serviceProvider)
     {
         InitializeComponent();
-        MainPage = new MainPage(service, debug, auth);
+        MainPage = serviceProvider.GetService<MainPage>();
         
         AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
         {
             Dumper.Dump(args.ExceptionObject.ToString());
         };
-        
     }
 }

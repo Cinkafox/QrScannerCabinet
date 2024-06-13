@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using System.Net;
 using System.Web;
+using QRShared.Datum;
 
 namespace QRScanner.Services;
 
@@ -13,6 +14,7 @@ public class AuthService
     public string? Login { get; private set; }
     public string? Reason { get; private set; }
     public Uri? CurrentUri { get; set; }
+    public Uri AuthUri => new Uri(CurrentUri, "/Auth");
     public bool IsAuthRequired { get; private set; } = true;
     public bool IsSuccessful { get; private set; }
 
@@ -27,13 +29,13 @@ public class AuthService
         if (CurrentUri is null)
         {
             _debug.Error("CurrentUri is not set!");
+            Reason = "CurrentUri is not set!";
             return;
         }
         
-        var authCheckUri = new UriBuilder(CurrentUri.Scheme, CurrentUri.Host, CurrentUri.Port, "/Auth");
-        var login = await _rest.GetAsync<string>(authCheckUri.Uri,cancellationToken,Token);
+        var login = await _rest.GetAsync<string>(AuthUri,cancellationToken,Token);
         
-        Login = login;
+        Login = login.Value;
         Reason = login.Message;
         IsAuthRequired = login.IsAuthRequire;
         IsSuccessful = !string.IsNullOrEmpty(login);
@@ -44,16 +46,14 @@ public class AuthService
         if (CurrentUri is null)
         {
             _debug.Error("CurrentUri is not set!");
+            Reason = "CurrentUri is not set!";
             return;
         }
         
-        var authUri = new UriBuilder(CurrentUri.Scheme, CurrentUri.Host, CurrentUri.Port, "/Auth/Login");
-        var query = HttpUtility.ParseQueryString("");
-        query.Add("login",login);
-        query.Add("password", password);
-        authUri.Query = query.ToString();
-        
-        var guid = await _rest.GetAsync<string>(authUri.Uri, cancellationToken);
+        var guid = await _rest.PostAsync<string,UserInformation>(new UserInformation()
+        {
+            Login = login, Password = password
+        },AuthUri, cancellationToken);
 
         Login = login;
         Reason = guid.Message;

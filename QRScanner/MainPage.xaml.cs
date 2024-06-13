@@ -9,15 +9,16 @@ using ContentPage = Microsoft.Maui.Controls.ContentPage;
 namespace QRScanner;
 public partial class MainPage : ContentPage
 {
-    public readonly BottomSheetCollection BottomSheetCollection;
-    public readonly RestService Rest;
-    public readonly DebugService Debug;
-    public readonly AuthService Auth;
+    public BottomSheetCollection BottomSheetCollection { get; }
+    public readonly List<ResultCabinet> History = [];
     
+    private readonly DebugService Debug;
+    private readonly CabinetInfoService _cabinetInfoService;
+    private readonly IServiceProvider _serviceProvider;
+
     private bool _isProcessing ;
     private bool _devEnabled;
-
-    public readonly List<ResultCabinet> History = new();
+    
     public bool DevEnabled
     {
         get => _devEnabled;
@@ -28,7 +29,7 @@ public partial class MainPage : ContentPage
         }
     }
 
-    public MainPage(RestService service,DebugService debug,AuthService auth)
+    public MainPage(DebugService debug,CabinetInfoService cabinetInfoService,IServiceProvider serviceProvider)
     {
         InitializeComponent();
         CameraBarcodeReaderView.Options = new BarcodeReaderOptions
@@ -39,10 +40,10 @@ public partial class MainPage : ContentPage
         };
 
         BottomSheetCollection = new BottomSheetCollection(this);
-        Rest = service;
         Debug = debug;
-        Auth = auth;
-        
+        _cabinetInfoService = cabinetInfoService;
+        _serviceProvider = serviceProvider;
+
         if (Dumper.TryReadDump(out var dumpReader))
         {
             Debug.Debug("____START READ DUMP____");
@@ -64,49 +65,41 @@ public partial class MainPage : ContentPage
         Debug.Debug("SCANNED: " + scanned);
         
         if(_isProcessing || BottomSheetCollection.IsSheetsShow ||
-           !Uri.TryCreate(scanned, UriKind.Absolute,out var uri) || 
-           !Uri.TryCreate(scanned + "/Images",UriKind.Absolute, out var imageUri))
+           !Uri.TryCreate(scanned, UriKind.Absolute,out var uri))
             return;
         
         Debug.Debug("RESOLVING: " + scanned);
+        SetProcessing(true);
         
-        _isProcessing = true;
-        MainThread.BeginInvokeOnMainThread(() =>
+        var result = await _cabinetInfoService.Get(uri, CancellationToken.None);
+        if (result is not null)
         {
-            ProcessingImage.IsVisible = true;
-            ProcessingImage.IsAnimationPlaying = true;
-        });
+            History.Add(result.Value);
+            await BottomSheetCollection.ShowBottomSheet(new ResultBottomSheet(result.Value));
+        }
+        
+        SetProcessing(false);
+    }
 
-        var information = await Rest.GetAsyncDefault(uri,new RoomInformation()
-        {
-            Id = -1,
-            Name = "Ошибка",
-            Description = "Кабинет не найден!"
-        },CancellationToken.None);
-        
-        var imageInformation = await Rest.GetAsyncDefault<List<RoomImageInformation>>(imageUri,[],CancellationToken.None);
-        var result = new ResultCabinet(information, imageInformation);
-        
-        if(information.Id != -1)
-            History.Add(result);
-        
-        await BottomSheetCollection.ShowBottomSheet(new ResultBottomSheet(result));
-        
-        _isProcessing = false;
+    private void SetProcessing(bool process)
+    {
+        _isProcessing = process;
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            ProcessingImage.IsVisible = false;
-            ProcessingImage.IsAnimationPlaying = false;
+            ProcessingImage.IsVisible = process;
+            ProcessingImage.IsAnimationPlaying = process;
         });
     }
 
     private async void DebugButtonClicked(object? sender, EventArgs e)
     {
-        await BottomSheetCollection.ShowBottomSheet(new DebugBottomSheet(Debug));
+        await BottomSheetCollection.ShowBottomSheet(_serviceProvider.GetService<DebugBottomSheet>()!);
     }
 
     private async void MenuButtonClicked(object? sender, EventArgs e)
     {
-        await BottomSheetCollection.ShowBottomSheet(new MenuBottomSheet(this));
+        var menu = _serviceProvider.GetService<MenuBottomSheet>()!;
+        
+        await BottomSheetCollection.ShowBottomSheet(menu);
     }
 }

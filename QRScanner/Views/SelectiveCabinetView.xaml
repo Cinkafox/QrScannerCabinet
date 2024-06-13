@@ -2,12 +2,12 @@
 
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="QRScanner.Views.CabinetMiniView">
+             x:Class="QRScanner.Views.SelectiveCabinetView">
     <HorizontalStackLayout>
-        <Label Text="Кабинет:" VerticalTextAlignment="Center" FontSize="20"/>
+        <Label Text="#" VerticalTextAlignment="Center" FontSize="20"/>
         <Label x:Name="NumberLabel" VerticalTextAlignment="Center" FontSize="20"/>
         <Label Text="Название:" Margin="5,0,0,0" VerticalTextAlignment="Center" FontSize="20"/>
         <Label x:Name="NameLabel" VerticalTextAlignment="Center" FontSize="20"/>
-        <Button Text="I" Margin="15,0,0,0" FontSize="20" Clicked="InfoButtonClicked"/>
+        <Button Text="Тык" Margin="15,0,0,0" FontSize="20" Clicked="ActionButtonClicked" x:Name="ActionButton"/>
     </HorizontalStackLayout>
 </ContentView>

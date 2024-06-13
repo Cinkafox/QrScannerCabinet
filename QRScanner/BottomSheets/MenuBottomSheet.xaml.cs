@@ -1,5 +1,6 @@
 using QRScanner.Utils;
 using QRScanner.Views;
+using QRShared.Datum;
 using The49.Maui.BottomSheet;
 
 namespace QRScanner.BottomSheets;
@@ -7,43 +8,34 @@ namespace QRScanner.BottomSheets;
 public partial class MenuBottomSheet : BottomSheet, ICancellationBehaviour
 {
     private readonly MainPage _mainPage;
+    private readonly IServiceProvider _serviceProvider;
     public CancellationToken CancellationToken { get; set; }
 
-    public MenuBottomSheet(MainPage mainPage)
+    public MenuBottomSheet(MainPage mainPage, IServiceProvider serviceProvider)
     {
-        _mainPage = mainPage;
         InitializeComponent();
-
-        var hCount = 0;
+        
+        _mainPage = mainPage;
+        _serviceProvider = serviceProvider;
+        
         foreach (var resultCabinet in mainPage.History)
         {
-            var cabView = new CabinetMiniView(resultCabinet);
-            
+            var cabView = new SelectiveCabinetView();
+            cabView.ActionName = "I";
+            cabView.LoadFromCabinetInfo(resultCabinet.Information);
+            cabView.ActionClicked += ActionClicked;
             History.Add(cabView);
-            hCount++;
         }
 
         DevSwitch.IsToggled = mainPage.DevEnabled;
         DevSwitch.Toggled += DevSwitchOnToggled;
-
-        if (_mainPage.Auth.IsAuthRequired)
-            MainThread.InvokeOnMainThreadAsync(CheckAuth);
-        else
-            PasteAuthDatum();
         
         Dismissed += OnDismissed;
     }
 
-    private void PasteAuthDatum()
-    { 
-        AuthButton.IsVisible = _mainPage.Auth.IsAuthRequired;
-        UserName.Text = _mainPage.Auth.Login ?? "Гость";
-    }
-
-    private async Task CheckAuth()
+    private async void ActionClicked(long obj, RoomInformation? roomInformation)
     {
-        await _mainPage.Auth.CheckAuth(CancellationToken);
-        await MainThread.InvokeOnMainThreadAsync(PasteAuthDatum);
+        await SwitchBottomSheet(new ResultBottomSheet(_mainPage.History.First(a => a.Information.Id==obj)));
     }
 
     private void DevSwitchOnToggled(object? sender, ToggledEventArgs e)
@@ -56,11 +48,15 @@ public partial class MenuBottomSheet : BottomSheet, ICancellationBehaviour
         DevSwitch.Toggled -= DevSwitchOnToggled;
         Dismissed -= OnDismissed;
     }
-    
-    private async void AuthButtonClicked(object? sender, EventArgs e)
+
+    private async void AddCabinetButtonClicked(object? sender, EventArgs e)
     {
+        await SwitchBottomSheet(_serviceProvider.GetService<AddCabinetBottomSheet>()!);
+    }
+
+    private async Task SwitchBottomSheet(BottomSheet bottomSheet)
+    {
+        await _mainPage.BottomSheetCollection.ShowBottomSheet(bottomSheet);
         await DismissAsync();
-        await _mainPage.BottomSheetCollection.ShowBottomSheet(new AuthBottomSheet(_mainPage.Auth));
-        await _mainPage.BottomSheetCollection.ShowBottomSheet(new MenuBottomSheet(_mainPage));
     }
 }

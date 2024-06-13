@@ -14,11 +14,7 @@
         
         <ScrollView>
             <VerticalStackLayout>
-                <HorizontalStackLayout Margin="0,5,0,5" HorizontalOptions="Fill">
-                    <Label Text="Приветствую," FontSize="20" VerticalTextAlignment="Center"/>
-                    <Label x:Name="UserName" HorizontalOptions="Fill" FontSize="20" FontAttributes="Bold" VerticalTextAlignment="Center"/>
-                    <Button Text="Авторизация" Clicked="AuthButtonClicked" x:Name="AuthButton" HorizontalOptions="End" Margin="5,0,0,0"/>
-                </HorizontalStackLayout>
+                <Button Text="Менеджер кабинетов" Clicked="AddCabinetButtonClicked"/>
                 
                 <HorizontalStackLayout >
                     <Label Text="Режим разработчика:" HorizontalTextAlignment="End" VerticalTextAlignment="Center" FontSize="20"/>

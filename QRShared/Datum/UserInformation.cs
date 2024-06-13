@@ -1,4 +1,3 @@
-#nullable enable
 using QRShared.DataBase.Attributes;
 using QRShared.Datum.DataBase.Attributes;
 

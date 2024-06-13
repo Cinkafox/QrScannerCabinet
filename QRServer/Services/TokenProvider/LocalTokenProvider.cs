@@ -11,7 +11,7 @@ public class LocalTokenProvider : ITokenProvider
     public Guid Add(string key)
     {
         if (_guidList.TryGetValue(key, out var guid)) 
-            return guid;
+            RemoveGuid(guid);
         
         guid = Guid.NewGuid();
         _lifeList.Add(guid,DateTime.Now + TokenLifeTime);
@@ -47,14 +47,17 @@ public class LocalTokenProvider : ITokenProvider
     private bool EnsureData(Guid guid)
     {
         if (_lifeList.TryGetValue(guid, out var time) && time > DateTime.Now) return true;
+        RemoveGuid(guid);
+        return false;
+    }
 
+    private void RemoveGuid(Guid guid)
+    {
         _lifeList.Remove(guid);
         if (_keyList.TryGetValue(guid, out var key))
         {
             _guidList.Remove(key);
             _keyList.Remove(guid);
         }
-
-        return false;
     }
 }

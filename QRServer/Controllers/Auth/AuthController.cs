@@ -37,7 +37,7 @@ public class AuthController : ControllerBase
     public IActionResult GetUser(string token)
     {
         if (_authService.TryGetUserByUid(token, out var login))
-            return Ok(login); 
+            return Ok($"\"{login}\""); 
         
         return Unauthorized();
     }

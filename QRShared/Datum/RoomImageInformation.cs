@@ -9,6 +9,6 @@ public class RoomImageInformation
     public long Id { get; set; }
     [ValueNotNull]
     public long RoomId { get; set; }
-    public string URL { get; init; } = string.Empty;
-    public string Description { get; init; } = string.Empty;
+    public string URL { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
 }

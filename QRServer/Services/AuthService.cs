@@ -21,9 +21,8 @@ public class AuthService
             guid = Guid.Empty;
             return false;
         }
-
-        if(!_tokenProvider.TryGet(login, out guid))
-            guid = _tokenProvider.Add(login);
+        
+        guid = _tokenProvider.Add(login);
         
         return true;
     }
@@ -35,7 +34,7 @@ public class AuthService
 
     public bool HasAuthed(string guid)
     {
-        return HasAuthed(Guid.Parse(guid));
+        return Guid.TryParse(guid, out var exacGuid) && HasAuthed(exacGuid);
     }
 
     public bool Register(string login, string password, out Guid guid)

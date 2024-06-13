@@ -19,6 +19,12 @@ public class RoomInformationController : ControllerBase
         _authService = authService;
     }
     
+    [HttpGet("List",Name = "RoomList")]
+    public List<RoomInformation> Get()
+    {
+        return _provider.Get<RoomInformation>();
+    }
+    
     [HttpGet("{id:long}",Name = "GetRoomInformation")]
     public RoomInformation Get(long id)
     {
@@ -69,7 +75,7 @@ public class RoomInformationController : ControllerBase
     }
     
     [HttpPost("Images",Name = "AddRoomImageInformation")]
-    public bool PostImage(RoomImageInformation room,string token)
+    public bool PostImage(RoomImageInformation room,string token,bool overrideValue = false )
     {
         if (!_authService.HasAuthed(token))
         {
@@ -77,7 +83,7 @@ public class RoomInformationController : ControllerBase
             return false;
         }
         
-        _provider.Push(room);
+        _provider.Push(room,overrideValue);
         return true;
     }
     
