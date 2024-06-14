@@ -1,9 +1,11 @@
+using Android.Widget;
 using QRScanner.Services;
 using QRShared.Datum;
+using Button = Microsoft.Maui.Controls.Button;
 
 namespace QRScanner.Views;
 
-public partial class CabinetActionView : ContentView
+public partial class CabinetListView : ContentView
 {
     private readonly AuthService _authService;
     private readonly CabinetInfoService _cabinetInfoService;
@@ -14,7 +16,7 @@ public partial class CabinetActionView : ContentView
 
     public CancellationToken CancellationToken = CancellationToken.None;
 
-    public CabinetActionView(RestService restService, AuthService authService,
+    public CabinetListView(RestService restService, AuthService authService,
         CabinetInfoService cabinetInfoService, IServiceProvider serviceProvider,
         DebugService debugService, UriHolderService uriHolderService)
     {
@@ -51,21 +53,44 @@ public partial class CabinetActionView : ContentView
         {
             var cab = new SelectiveCabinetView();
             cab.LoadFromCabinetInfo(room);
-            cab.ActionClicked += EditClicked;
-            cab.ActionName = "Редактировать";
-            cab.RemoveRequired = CabinetRemoveRequired;
+            
+            var actionButton = new Button();
+            actionButton.Text = "Редактировать";
+            actionButton.Clicked += (_, _) => EditClicked(room.Id);
+
+            var removeButton = new Button();
+            removeButton.Text = "Удалить";
+            removeButton.Clicked += (_, _) => CabinetRemoveRequired(cab);
+
+            var getQRButton = new Button();
+            getQRButton.Text = "QR code";
+            getQRButton.Clicked += (_, _) => QrCodeRequired(room.Id);
+            
+            cab.AddButton(actionButton);
+            cab.AddButton(removeButton);
+            cab.AddButton(getQRButton);
+            
             CabinetStack.Children.Add(cab);
         }
     }
 
+    private async void QrCodeRequired(long id)
+    {
+        await Clipboard.Default.SetTextAsync(_uriHolderService.GetQrCodeUri(id).ToString());
+        _debugService.Toast("Ссылка скопирована в буфер обмена");
+    }
+
     private async void CabinetRemoveRequired(SelectiveCabinetView obj)
     {
+        if (!await EnsureAuth())
+            return;
+        
         await _restService.DeleteAsync<RawResult>(_uriHolderService.GetRoomUri(obj.CabinetId), CancellationToken,
             _authService.Token);
         CabinetStack.Children.Remove(obj);
     }
 
-    private async void EditClicked(long id, RoomInformation? roomInformation)
+    private async void EditClicked(long id)
     {
         await EditCabinet(id);
     }

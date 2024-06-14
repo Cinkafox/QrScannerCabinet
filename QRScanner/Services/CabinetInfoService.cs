@@ -9,6 +9,8 @@ public class CabinetInfoService
     private readonly DebugService _debugService;
     private readonly RestService _restService;
     private readonly UriHolderService _uriHolderService;
+    
+    public string? Reason { get; private set; }
 
     public CabinetInfoService(RestService restService, DebugService debugService, AuthService authService,
         UriHolderService uriHolderService)
@@ -22,6 +24,7 @@ public class CabinetInfoService
     public async Task<ResultCabinet?> Get(Uri uri, CancellationToken cancellationToken)
     {
         var information = await _restService.GetAsync<RoomInformation>(uri, cancellationToken);
+        Reason = information.Message;
         if (information.Value == null) return null;
 
         var imageInformation = await _restService.GetAsyncDefault<List<RoomImageInformation>>(

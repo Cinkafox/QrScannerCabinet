@@ -11,8 +11,8 @@ public partial class MainPage : ContentPage
     private readonly CabinetInfoService _cabinetInfoService;
     private readonly IServiceProvider _serviceProvider;
 
-    private readonly DebugService Debug;
-    public readonly List<ResultCabinet> History = [];
+    private readonly DebugService _debug;
+    public readonly Dictionary<long,ResultCabinet> History = [];
     private bool _devEnabled;
 
     private bool _isProcessing;
@@ -28,20 +28,20 @@ public partial class MainPage : ContentPage
         };
 
         BottomSheetCollection = new BottomSheetCollection(this);
-        Debug = debug;
+        _debug = debug;
         _cabinetInfoService = cabinetInfoService;
         _serviceProvider = serviceProvider;
 
         if (Dumper.TryReadDump(out var dumpReader))
         {
-            Debug.Debug("____START READ DUMP____");
-            while (dumpReader.ReadLine() is { } line) Debug.Debug(line);
+            _debug.Debug("____START READ DUMP____");
+            while (dumpReader.ReadLine() is { } line) _debug.Debug(line);
 
             dumpReader.Dispose();
-            Debug.Debug("____END READ DUMP____");
+            _debug.Debug("____END READ DUMP____");
         }
 
-        Debug.Debug("Application was started!");
+        _debug.Debug("Application was started!");
     }
 
     public BottomSheetCollection BottomSheetCollection { get; }
@@ -59,22 +59,27 @@ public partial class MainPage : ContentPage
     private async void BarcodesDetected(object? sender, BarcodeDetectionEventArgs e)
     {
         var scanned = e.Results[0].Value;
-        Debug.Debug("SCANNED: " + scanned);
+        _debug.Debug("SCANNED: " + scanned);
 
         if (_isProcessing || BottomSheetCollection.IsSheetsShow ||
             !Uri.TryCreate(scanned, UriKind.Absolute, out var uri))
             return;
 
-        Debug.Debug("RESOLVING: " + scanned);
+        _debug.Debug("RESOLVING: " + scanned);
         SetProcessing(true);
 
         var result = await _cabinetInfoService.Get(uri, CancellationToken.None);
         if (result is not null)
         {
-            History.Add(result.Value);
+            History.Add(result.Value.Information.Id, result.Value);
             await BottomSheetCollection.ShowBottomSheet(new ResultBottomSheet(result.Value));
         }
+        else
+        {
+            _debug.Toast($"Ошибка при чтении из ссылки: {_cabinetInfoService.Reason}");
+        }
 
+        Thread.Sleep(TimeSpan.FromSeconds(1));
         SetProcessing(false);
     }
 

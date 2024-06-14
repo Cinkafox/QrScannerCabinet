@@ -12,9 +12,8 @@
             <Label Text="Название:" Margin="5,0,0,0" VerticalTextAlignment="Center" FontSize="20" />
             <Label x:Name="NameLabel" VerticalTextAlignment="Center" FontSize="20" />
         </HorizontalStackLayout>
-        <FlexLayout Direction="Row" JustifyContent="SpaceAround" AlignContent="Stretch">
-            <Button Text="Тык" Margin="5" FontSize="20" Clicked="ActionButtonClicked" x:Name="ActionButton" />
-            <Button Text="-" Margin="5" FontSize="20" Clicked="RemoveButtonClicked" />
+        <FlexLayout Direction="Row" JustifyContent="SpaceAround" AlignContent="Stretch" x:Name="ButtonLayout">
+                
         </FlexLayout>
     </VerticalStackLayout>
 </ContentView>

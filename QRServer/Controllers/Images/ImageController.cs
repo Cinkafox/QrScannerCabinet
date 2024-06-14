@@ -36,8 +36,6 @@ public class ImageController : ControllerBase
         if (!_authService.HasAuthed(token))
             return Unauthorized();
 
-        Console.WriteLine("POST SOME IMAGE ");
-
         var fileName = Guid.NewGuid().ToString();
 
         using (var stream = formFile.OpenReadStream())

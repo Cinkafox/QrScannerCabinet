@@ -1,6 +1,5 @@
 using QRScanner.Utils;
 using QRScanner.Views;
-using QRShared.Datum;
 using The49.Maui.BottomSheet;
 
 namespace QRScanner.BottomSheets;
@@ -20,9 +19,14 @@ public partial class MenuBottomSheet : BottomSheet, ICancellationBehaviour
         foreach (var resultCabinet in mainPage.History)
         {
             var cabView = new SelectiveCabinetView();
-            cabView.ActionName = "I";
-            cabView.LoadFromCabinetInfo(resultCabinet.Information);
-            cabView.ActionClicked += ActionClicked;
+            cabView.LoadFromCabinetInfo(resultCabinet.Value.Information);
+            
+            var actionButton = new Button();
+            actionButton.Text = "Информация";
+            actionButton.Clicked += (_,_)=>
+                ActionClicked(resultCabinet.Value.Information.Id);
+            
+            cabView.AddButton(actionButton);
             History.Add(cabView);
         }
 
@@ -34,9 +38,9 @@ public partial class MenuBottomSheet : BottomSheet, ICancellationBehaviour
 
     public CancellationToken CancellationToken { get; set; }
 
-    private async void ActionClicked(long obj, RoomInformation? roomInformation)
+    private async void ActionClicked(long obj)
     {
-        await SwitchBottomSheet(new ResultBottomSheet(_mainPage.History.First(a => a.Information.Id == obj)));
+        await SwitchBottomSheet(new ResultBottomSheet(_mainPage.History[obj]));
     }
 
     private void DevSwitchOnToggled(object? sender, ToggledEventArgs e)
@@ -52,7 +56,7 @@ public partial class MenuBottomSheet : BottomSheet, ICancellationBehaviour
 
     private async void AddCabinetButtonClicked(object? sender, EventArgs e)
     {
-        await SwitchBottomSheet(_serviceProvider.GetService<AddCabinetBottomSheet>()!);
+        await SwitchBottomSheet(_serviceProvider.GetService<CabinetManagementBottomSheet>()!);
     }
 
     private async Task SwitchBottomSheet(BottomSheet bottomSheet)

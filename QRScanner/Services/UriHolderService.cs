@@ -25,6 +25,11 @@ public class UriHolderService
         return new Uri(CurrentUri, $"/RoomInformation/{id}");
     }
 
+    public Uri GetQrCodeUri(long id)
+    {
+        return new Uri(CurrentUri, $"/QRCode/{id}");
+    }
+
     public bool EnsureUri()
     {
         if (CurrentUri is not null) return true;

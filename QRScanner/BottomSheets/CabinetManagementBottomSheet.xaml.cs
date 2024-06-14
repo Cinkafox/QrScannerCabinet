@@ -1,21 +1,16 @@
-using QRScanner.Services;
 using QRScanner.Utils;
 using QRScanner.Views;
 using The49.Maui.BottomSheet;
 
 namespace QRScanner.BottomSheets;
 
-public partial class AddCabinetBottomSheet : BottomSheet, ICancellationBehaviour
+public partial class CabinetManagementBottomSheet : BottomSheet, ICancellationBehaviour
 {
-    private readonly AuthService _authService;
-    private readonly RestService _restService;
     private readonly IServiceProvider _serviceProvider;
 
-    public AddCabinetBottomSheet(RestService restService, AuthService authService, IServiceProvider serviceProvider)
+    public CabinetManagementBottomSheet(IServiceProvider serviceProvider)
     {
         InitializeComponent();
-        _restService = restService;
-        _authService = authService;
         _serviceProvider = serviceProvider;
 
         var urlInput = _serviceProvider.GetService<ServerUrlInputView>()!;
@@ -36,7 +31,7 @@ public partial class AddCabinetBottomSheet : BottomSheet, ICancellationBehaviour
 
     private void OnAuthProceed()
     {
-        var cabinetAct = _serviceProvider.GetService<CabinetActionView>()!;
+        var cabinetAct = _serviceProvider.GetService<CabinetListView>()!;
         cabinetAct.CancellationToken = CancellationToken;
         ViewContainer.Content = cabinetAct;
     }

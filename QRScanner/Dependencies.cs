@@ -20,9 +20,9 @@ public static class Dependencies
         builder.Services.AddSingleton<MainPage>();
         builder.Services.AddTransient<MenuBottomSheet>();
         builder.Services.AddTransient<DebugBottomSheet>();
-        builder.Services.AddTransient<AddCabinetBottomSheet>();
+        builder.Services.AddTransient<CabinetManagementBottomSheet>();
         builder.Services.AddTransient<ServerUrlInputView>();
-        builder.Services.AddTransient<CabinetActionView>();
+        builder.Services.AddTransient<CabinetListView>();
         builder.Services.AddTransient<AuthView>();
         builder.Services.AddTransient<CabinetEditView>();
         builder.Services.AddTransient<ImageCabinetView>();

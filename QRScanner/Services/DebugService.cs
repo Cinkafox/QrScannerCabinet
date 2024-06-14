@@ -1,3 +1,5 @@
+using Android.Widget;
+
 namespace QRScanner.Services;
 
 public class DebugService
@@ -25,6 +27,12 @@ public class DebugService
     public void Error(string message)
     {
         AppendMessage(new DebugMessage(MessageStat.ERRO, message));
+    }
+
+    public void Toast(string message)
+    {
+        var toast = Android.Widget.Toast.MakeText(Platform.AppContext,message,ToastLength.Long);
+        toast?.Show();
     }
 }
 
