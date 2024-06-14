@@ -16,6 +16,8 @@ public partial class CabinetListView : ContentView
 
     public CancellationToken CancellationToken = CancellationToken.None;
 
+    public Action? OnAuthError;
+
     public CabinetListView(RestService restService, AuthService authService,
         CabinetInfoService cabinetInfoService, IServiceProvider serviceProvider,
         DebugService debugService, UriHolderService uriHolderService)
@@ -107,24 +109,29 @@ public partial class CabinetListView : ContentView
 
         var cabinetEdit = _serviceProvider.GetService<CabinetEditView>()!;
 
-        if (id != null)
-        {
-            var cabinetInfo = await _cabinetInfoService.Get(id.Value, CancellationToken);
-            if (cabinetInfo != null) cabinetEdit.LoadFromResult(cabinetInfo.Value);
-        }
-
-        cabinetEdit.OnResult += OnResult;
-        cabinetEdit.CancellationToken = CancellationToken;
-
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
             AdditionView.Content = cabinetEdit;
             AdditionView.IsVisible = true;
             MainLayout.IsVisible = false;
         });
+        
+        if (id != null)
+        {
+            var cabinetInfo = await _cabinetInfoService.Get(id.Value, CancellationToken);
+            if (cabinetInfo != null) cabinetEdit.LoadFromResult(cabinetInfo.Value);
+        }
+        else
+        {
+            cabinetEdit.LoadEmpty();
+        }
+
+        cabinetEdit.OnResult += OnResult;
+        cabinetEdit.CancellationToken = CancellationToken;
+        
     }
 
-    private async void OnResult(RoomInformation roomInformation, List<ImageInfoCompound> list, List<long> removedList)
+    private async void OnResult()
     {
         await MainThread.InvokeOnMainThreadAsync(() =>
         {
@@ -141,6 +148,10 @@ public partial class CabinetListView : ContentView
         await _authService.CheckAuth(CancellationToken);
         if (_authService.Reason is not null)
             await MainThread.InvokeOnMainThreadAsync(() => Message.Text = _authService.Reason);
+        
+        if(!_authService.IsSuccessful)
+            OnAuthError?.Invoke();
+        
         return _authService.IsSuccessful;
     }
 }

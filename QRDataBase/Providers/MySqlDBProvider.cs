@@ -29,6 +29,7 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
 
     public void Push<T>(T information, bool force = false)
     {
+        EnsureConnection();
         CreateTableIfNotExist<T>();
 
         if (Has<T>(GetKeyProperty(information)))
@@ -42,6 +43,7 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
 
     public List<T> Get<T>(ISearchItem? search = null, int limit = -1)
     {
+        EnsureConnection();
         CreateTableIfNotExist<T>();
         var objList = new List<T>();
 
@@ -60,6 +62,7 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
 
     public void Remove<T>(ISearchItem? search = null)
     {
+        EnsureConnection();
         CreateTableIfNotExist<T>();
         using var command = _mySqlConnection.CreateCommand();
         command.CommandText = "DELETE FROM " + typeof(T).Name;
@@ -159,6 +162,14 @@ public class MySqlDBProvider : IDataBaseProvider, IAsyncDisposable
         }
 
         mySqlCommand.Parameters[dbName].Value = value;
+    }
+
+    private void EnsureConnection()
+    {
+        if (_mySqlConnection.IsDisposed)
+        {
+            _mySqlConnection.Open();
+        }
     }
 
     private void CreateTableIfNotExist<T>()

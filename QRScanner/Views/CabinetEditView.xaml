@@ -1,26 +1,47 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 
-<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="QRScanner.Views.CabinetEditView">
+<ContentView
+    x:Class="QRScanner.Views.CabinetEditView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
     <ScrollView>
         <VerticalStackLayout Margin="5" x:Name="EditLayout">
-            <Label x:Name="Message" VerticalTextAlignment="Center" />
+            <Label VerticalTextAlignment="Center" x:Name="Message" />
             <HorizontalStackLayout Margin="5">
                 <Label Text="Id:" VerticalTextAlignment="Center" />
-                <Entry x:Name="IdEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill" />
+                <Entry
+                    HorizontalOptions="Fill"
+                    VerticalTextAlignment="Center"
+                    x:Name="IdEntry" />
             </HorizontalStackLayout>
             <HorizontalStackLayout Margin="5">
                 <Label Text="Имя:" VerticalTextAlignment="Center" />
-                <Entry x:Name="NameEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill" />
+                <Entry
+                    HorizontalOptions="Fill"
+                    VerticalTextAlignment="Center"
+                    x:Name="NameEntry" />
             </HorizontalStackLayout>
-            <HorizontalStackLayout Margin="5">
+            <VerticalStackLayout Margin="5">
                 <Label Text="Описание:" VerticalTextAlignment="Center" />
-                <Entry x:Name="DescEntry" VerticalTextAlignment="Center" HorizontalOptions="Fill" />
-            </HorizontalStackLayout>
-            <Button Text="Добавить фото" Clicked="AddImageButtonClicked" Margin="5,15,5,5" />
+                <Editor
+                    AutoSize="TextChanges"
+                    HorizontalOptions="Fill"
+                    VerticalTextAlignment="Center"
+                    x:Name="DescEntry" />
+            </VerticalStackLayout>
+            <Button
+                Clicked="AddImageButtonClicked"
+                Margin="5,15,5,5"
+                Text="Добавить фото" />
             <VerticalStackLayout Margin="5" x:Name="ImageLayout" />
-            <Button Text="Продолжить" Clicked="ProceedClicked" />
+            <Button
+                Clicked="ProceedClicked"
+                Margin="5"
+                Text="Продолжить" />
+            <Button
+                Clicked="BackClicked"
+                Margin="5"
+                Text="Назад" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentView>

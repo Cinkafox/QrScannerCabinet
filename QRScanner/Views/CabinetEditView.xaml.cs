@@ -16,7 +16,7 @@ public partial class CabinetEditView : ContentView
 
     public CancellationToken CancellationToken;
 
-    public Action<RoomInformation, List<ImageInfoCompound>, List<long>>? OnResult;
+    public Action? OnResult;
 
     public CabinetEditView(IServiceProvider serviceProvider, AuthService authService, DebugService debugService,
         RestService restService, UriHolderService uriHolderService)
@@ -27,15 +27,23 @@ public partial class CabinetEditView : ContentView
         _debugService = debugService;
         _restService = restService;
         _uriHolderService = uriHolderService;
+        EditLayout.IsEnabled = false;
     }
 
     public void LoadFromResult(ResultCabinet resultCabinet)
     {
         IdEntry.Text = resultCabinet.Information.Id.ToString();
+        IdEntry.IsEnabled = false;
         NameEntry.Text = resultCabinet.Information.Name;
         DescEntry.Text = resultCabinet.Information.Description;
 
         foreach (var imageInformation in resultCabinet.ImageInformation) AddImageInfo(imageInformation);
+        EditLayout.IsEnabled = true;
+    }
+
+    public void LoadEmpty()
+    {
+        EditLayout.IsEnabled = true;
     }
 
     private void AddImageInfo(RoomImageInformation? imageInformation)
@@ -114,12 +122,17 @@ public partial class CabinetEditView : ContentView
             }
         }
 
-        OnResult?.Invoke(room, compoundList, _imageRemovedId);
+        OnResult?.Invoke();
     }
 
     private void AddImageButtonClicked(object? sender, EventArgs e)
     {
         AddImageInfo(null);
+    }
+
+    private void BackClicked(object? sender, EventArgs e)
+    {
+        OnResult?.Invoke();
     }
 }
 

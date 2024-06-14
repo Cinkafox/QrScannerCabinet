@@ -31,8 +31,11 @@ public class DebugService
 
     public void Toast(string message)
     {
-        var toast = Android.Widget.Toast.MakeText(Platform.AppContext,message,ToastLength.Long);
-        toast?.Show();
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var toast = Android.Widget.Toast.MakeText(Platform.AppContext,message,ToastLength.Long);
+            toast?.Show();
+        });
     }
 }
 

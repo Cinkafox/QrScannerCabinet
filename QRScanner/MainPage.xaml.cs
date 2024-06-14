@@ -71,7 +71,7 @@ public partial class MainPage : ContentPage
         var result = await _cabinetInfoService.Get(uri, CancellationToken.None);
         if (result is not null)
         {
-            History.Add(result.Value.Information.Id, result.Value);
+            History[result.Value.Information.Id] = result.Value;
             await BottomSheetCollection.ShowBottomSheet(new ResultBottomSheet(result.Value));
         }
         else
