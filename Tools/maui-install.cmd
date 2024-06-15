@@ -1,0 +1,1 @@
+﻿dotnet workload install maui-android
