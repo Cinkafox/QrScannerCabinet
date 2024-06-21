@@ -11,7 +11,7 @@ public static class Dumper
         using var stream =
             new FileStream(DumpPath, FileMode.Create);
         using var sw = new StreamWriter(stream);
-        sw.WriteLine("FUCK!!! " + message);
+        sw.WriteLine("FATAL ERROR!!! " + message);
         sw.Flush();
     }
 
